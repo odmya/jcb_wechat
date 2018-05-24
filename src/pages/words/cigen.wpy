@@ -1,0 +1,120 @@
+
+<style>
+page{
+    background-color: #FFFFFF;
+}
+image{
+    margin: 4px 0;
+}
+.avatar {
+  width: 25px;
+  height: 25px;
+}
+.page__hd{
+  padding: 5px 10px;
+  text-align: center;
+}
+.weui-article__section{
+ padding: 5px;
+}
+.top-margin{
+  margin:50px;
+}
+.page__title{
+  font-size:15px;
+  font-weight: bold;
+}
+.weui-article__section1{
+  padding-bottom: 2px;
+}
+.weui-article__p,.page__desc{
+  font-size:12px;
+}
+.cigen_article{
+  text-align: left;
+}
+
+</style>
+<template>
+  <searchbar></searchbar>
+    <view class="page top-margin">
+      <view class="page__title">{{ cigen.name }}</view>
+      <view class="page__desc">
+            <rich-text nodes="{{cigen.description}}"></rich-text> 
+      </view>
+      <view class="page__bd">
+            <view class="weui-article">
+                <view class="weui-article__section">
+                  <repeat for="{{ cigen.cixing.data}}" key="id" index="index" item="cigencixing">
+                    <view class="weui-article__section1">
+                      <view class="weui-article__h3">{{cigencixing.cixing}} </view>
+
+                        <view>
+                            <repeat for="{{ cigencixing.words }}" key="id1" index="index1" item="word">
+                              <view class="weui-article__p cigen_article">
+                                <navigator url="/pages/words/query?word={{ word.word }}" hover-class="weui-cell_active">
+                                  <view>{{word.word}} {{word.pivot.explain}}</view>  
+                                 </navigator>
+                                <view>{{word.pivot.detail}}</view>  
+                              </view>
+
+                            </repeat>
+                            
+                        </view>
+                         
+                    </view> 
+                  </repeat>   
+                </view> 
+            </view> 
+      </view>               
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+  import Searchbar from '../../components/searchbar2';
+
+  export default class CigenShow extends wepy.page {
+    components = {
+            searchbar: Searchbar
+        }
+    config = {
+      navigationBarTitleText: '单词',
+    }
+    data = {
+      cigen:''
+
+    }
+
+
+    methods = {
+
+    }
+    // 获取词根单词
+    async getWords(id) {
+      try {
+
+        let rootResponse = await api.request({
+          url: 'roots/' + id,
+          data: {
+            include: 'cixing'
+          }
+        })
+        let cigen = rootResponse.data.data;
+
+        this.cigen = cigen
+        this.$apply()
+      } catch (err) {
+        console.log(id)
+        wepy.showModal({
+          title: '提示',
+          content: '服务器错误，请联系管理员'
+        })
+      }
+    }
+    onLoad(options) {
+      this.getWords(options.id)
+    }
+  }
+</script>

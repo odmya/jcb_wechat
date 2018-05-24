@@ -1,0 +1,168 @@
+
+<style>
+page{
+    background-color: #FFFFFF;
+}
+
+.avatar {
+  width: 17px;
+  height: 17px;
+
+}
+.page__hd{
+  padding: 5px 10px;
+  text-align: center;
+}
+.weui-article__section{
+ padding: 5px;
+}
+.weui-article__section1{
+  padding-bottom: 2px;
+}
+.weui-article__p,.page__desc{
+  font-size:12px;
+}
+.weui-flex__item{
+  text-align: left;
+  
+}
+.changezindex{
+  z-index: 1000;
+}
+</style>
+<template>
+  <searchbar></searchbar>
+    <view class="page word-top">
+        <view class="page__hd">
+            <view class="page__title">{{ words.word }}</view>
+            <view class="weui-flex">
+              <repeat for="{{ words.voice.data }}" key="id" index="index" item="voice">
+
+              <view class="weui-flex__item" data-path="{{voice.path}}" @tap="playmp3"> {{voice.symbol}}<image class="avatar"  src="../../images/sound.png" /> </view>
+              </repeat>
+            </view>
+        </view>
+        <view class="page__bd">
+            <view class="weui-article">
+                <view class="weui-article__section">
+                    <view class="weui-article__section1">
+
+                        <view class="weui-article__p">
+                          <repeat for="{{ words.explain.data.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
+                        </view>
+                    </view>
+                    <view class="weui-article__section1" wx:if="{{ words.tip.data.length }}">
+                        <view class="weui-article__h3" @tap="tip">记忆窍门</view>
+                          <view wx:if="{{closetip}}">
+                            <repeat for="{{ words.tip.data }}" key="id" index="index" item="tip">
+                              <view class="weui-article__p">
+                                {{tip.tip}} 
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                         
+                        
+                    </view>
+
+                    <view class="weui-article__section" wx:if="{{ words.root.data.length }}">
+                        <view class="weui-article__h3" @tap="root">词根</view>
+                          <view wx:if="{{closetip}}">
+                            <repeat for="{{ words.root.data }}" key="id" index="index" item="root">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                                   <view>{{root.root_alias?root.root_alias:root.root}} </view>
+                                 </navigator>
+
+                                
+                                <view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                         
+                        
+                    </view>
+
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+  import Searchbar from '../../components/searchbar';
+
+  export default class WordShow extends wepy.page {
+    components = {
+            searchbar: Searchbar
+        }
+    config = {
+      navigationBarTitleText: '单词',
+    }
+    data = {
+      // 话题数据
+      words: '',
+      closetip: true,
+      innerAudioContext:''
+
+    }
+
+
+    methods = {
+
+        tip(e){
+            if(this.closetip==false){
+              this.closetip =true;
+            }else{
+              this.closetip =false;
+            }
+        },
+
+       playmp3(event){
+                let path="https://www.jciba.cn/" + event.currentTarget.dataset.path;
+
+                this.innerAudioContext = wepy.createInnerAudioContext()
+                this.innerAudioContext.autoplay = true
+                this.innerAudioContext.obeyMuteSwitch = false 
+                this.innerAudioContext.src = path
+                this.innerAudioContext.onPlay(() => {
+                    console.log('开始播放')
+                })
+                 
+            }
+    }
+    // 获取话题数据
+    async getTopic(word) {
+      try {
+        let wordResponse = await api.request({
+                          url: 'word',
+                          method: 'POST',
+                          data: {
+  
+                            word: word,
+                            include:"explain, voice,tip,level,root"
+                          }
+                        })
+        let words = wordResponse.data.data;
+
+
+        this.words = words
+        this.$apply()
+      } catch (err) {
+        //console.log(err)
+        wepy.showModal({
+          title: '提示',
+          content: '服务器错误，请联系管理员'
+        })
+      }
+    }
+    onLoad(options) {
+      this.getTopic(options.word)
+    }
+  }
+</script>

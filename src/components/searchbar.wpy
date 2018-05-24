@@ -1,0 +1,180 @@
+<style>
+.searchbar-result{
+    margin-top: 0;
+    font-size: 14px;
+}
+.searchbar-result:before{
+    display: none;
+}
+.weui-cell{
+    padding: 12px 15px 12px 35px;
+}
+
+.searchword{
+    margin-bottom: 400rpx; 
+     position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+  
+    height: 400rpx;
+}
+.changezindexcss{
+
+      z-index: 999;
+}
+.currectzindexcss{
+
+      z-index: -1;
+}
+</style>
+<template>
+
+    <view class="page">
+        <view class="page__bd">
+            <view class="weui-search-bar" >
+                <view class="weui-search-bar__form">
+                    <view class="weui-search-bar__box">
+                        <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+                        <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}" @input="inputTyping" />
+                        <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+                            <icon type="clear" size="14"></icon>
+                        </view>
+                    </view>
+                    <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
+                        <icon class="weui-icon-search" type="search" size="14"></icon>
+                        <view class="weui-search-bar__text">搜索</view>
+                    </label>
+                </view>
+                <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="searchword">搜索</view>
+            </view>
+            <view class="weui-cells searchbar-result" wx:if="{{searchresult.length > 0}}">
+                <repeat for="{{ searchresult }}" key="id" index="index" item="word">
+                    <navigator url="/pages/words/query?word={{ word.word }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                        <view class="weui-cell__bd">
+
+                            <view class="weui-media-box__info__meta">{{ word.word }} {{ word.explain_china.explain }}</view>
+                        </view>
+                    </navigator>
+
+                 </repeat>                    
+                
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '@/utils/api';
+    export default class Searchbar extends wepy.page {
+
+        data = {
+            inputShowed: false,
+            inputVal: '',
+            queryword:'',
+            searchresult:[],
+           // changezindex:'currectzindexcss',
+            page: 1
+            
+        };
+
+
+ watch = {
+
+
+
+      async inputVal (newValue, oldValue) {
+            if(newValue.length>0){
+               // this.changezindex ='changezindexcss';
+                try {
+
+                    this.searchresult=[];
+                       // 请求话题列表接口
+                        let wordResponse = await api.request({
+                          url: 'wordsearch',
+                          method: 'POST',
+                          data: {
+                            page: 1,
+                            query: newValue,
+                            include:"explain"
+                          }
+                        })
+                        let searchresult = wordResponse.data.data;
+                        // 将数据合并到 this.topics
+                        this.searchresult = searchresult;
+                        this.$apply()
+                } catch (err) {
+                  wepy.showModal({
+                    title: '提示',
+                    content: '服务器错误，请联系管理员'
+                  })
+                }
+
+            }else{
+                this.searchresult=[];
+               // this.changezindex ='currectzindexcss';
+            }
+            
+           // console.log("test" + this.changezindex);
+          console.log(`num value: ${oldValue} -> ${newValue}`);
+      }
+  }
+
+
+
+        methods = {
+
+            async searchword(){
+                this.inputShowed = true;
+
+                try {
+
+                    this.searchresult=[];
+                       // 请求话题列表接口
+                        let wordResponse = await api.request({
+                          url: 'wordsearch',
+                          method: 'POST',
+                          data: {
+                            page: 1,
+                            query: this.queryword,
+                            include:"explain"
+                          }
+                        })
+                        let searchresult = wordResponse.data.data;
+                        // 将数据合并到 this.topics
+                        this.searchresult = searchresult;
+                        this.$apply()
+                } catch (err) {
+                  wepy.showModal({
+                    title: '提示',
+                    content: '服务器错误，请联系管理员'
+                  })
+                }
+
+            },
+           
+            showInput () {
+                this.inputShowed = true;
+            },
+            hideInput () {
+                this.inputVal = '';
+                this.inputShowed = false;
+                this.searchresult=[];
+            },
+            clearInput () {
+                this.inputVal = '';
+                //this.inputShowed = false;
+                this.searchresult=[];
+            },
+
+           inputTyping (e) {
+                this.inputShowed = true;
+                this.queryword = e.detail.value;
+                this.inputVal = e.detail.value;
+
+
+            }
+        }
+    }
+</script>
