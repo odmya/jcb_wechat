@@ -1,0 +1,799 @@
+
+<style>
+page{
+    background-color: #FFFFFF;
+}
+
+.avatar {
+  width: 17px;
+  height: 17px;
+
+}
+.page__hd{
+  padding: 5px 10px;
+  text-align: center;
+}
+.weui-article__section{
+ padding: 5px;
+}
+.weui-article__section1{
+  padding-bottom: 2px;
+}
+.weui-article__p,.page__desc{
+  font-size:12px;
+  color:#888888;
+
+}
+.weui-flex__item{
+  text-align: left;
+  
+}
+.weui-article__h3{
+  font-size:15px;
+}
+.changezindex{
+  z-index: 1000;
+}
+.weui-media-link{
+  color:blue;
+  text-decoration: underline;
+  font-size: 14px;
+}
+.section_word{
+
+}
+</style>
+<template>
+    <view class="page" animation="{{animationData}}">
+    <view wx:if="{{ loggedIn }}">
+      <view wx:if="{{ShowNewWord}}">
+      	<view class="page__hd">
+            <view class="page__title">{{ currentdata.word }}</view>
+            <view class="weui-flex">
+              <repeat for="{{ currentdata.voice }}" key="id" index="index" item="voice">
+
+              <view class="weui-flex__item" data-path="{{voice.path}}" @tap="playmp3"> {{voice.symbol}}<image class="avatar"  src="../../images/sound.png" /> </view>
+              </repeat>
+            </view>
+
+            <view class="weui-article__section">
+            	 <view class="weui-article__section1">
+					 <repeat for="{{ currentdata.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
+                 </view>
+           
+
+
+                  <view class="weui-article__section1" wx:if="{{ currentdata.tips.length }}">
+
+                       <view class="weui-panel__ft">
+                           <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="tip">记忆窍门</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                          </view>
+                      
+
+                          <view wx:if="{{closetip}}">
+                            <repeat for="{{ currentdata.tips }}" key="id" index="index" item="tip">
+                              <view class="weui-article__p">
+                                {{tip.tip}} 
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                      </view>  
+                         
+                        
+                   </view>
+
+                   <view class="weui-article__section1" wx:if="{{ currentdata.root.length }}">
+                       <view class="weui-panel__ft">
+                          <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="cigen">词根</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                          </view>
+                          <view wx:if="{{closecigen}}">
+                            <repeat for="{{ currentdata.root }}" key="id" index="index" item="root">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view>{{root.root_alias?root.root_alias:root.root}} </view>
+                                 </navigator>
+
+                                
+                                <view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                        </view>      
+                    </view>
+
+                    <view class="weui-article__section1" wx:if="{{ currentdata.sentences.length }}">
+                      <view class="weui-panel__ft">
+                          <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="liju">例句</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
+                          </view>
+                           <view wx:if="{{closeliju}}">
+                            <repeat for="{{ currentdata.sentences }}" key="id" index="index" item="liju">
+                              <view class="weui-article__p">
+                                 <view>{{liju.english}} </view>    
+                                 <view>  {{liju.chinese}} --{{liju.quote}} </view>                               
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                      </view>    
+                    </view>
+			 </view>
+			<view wx:if="{{currentdata}}">
+				<button type="warn" @tap="nextword">继续学习</button>
+			</view>
+           
+        </view>
+      </view>
+
+      <view wx:if="{{ShowReview}}">
+      	<view class="page__title">复习{{ reviewitem.word }}</view>
+      	<view class="page__title">{{  reviewitem.word_review.next_time?reviewitem.word_review.next_time:"一小时后需要及时复习" }}</view>
+      	<view>
+              <view class="weui-article__p">
+              	<repeat for="{{ reviewitem.voice }}" key="id" index="index" item="voice">
+
+              		<view class="weui-flex__item" data-path="{{voice.path}}" @tap="playmp3"> {{voice.symbol}}<image class="avatar"  src="../../images/sound.png" /> </view>
+              	</repeat>
+              </view>
+
+              <view class="weui-article__p">
+              	<radio-group class="radio-group" bindchange="radioChange">
+	              	 <repeat for="{{ explain_answer }}" key="id" index="index" item="answer">
+						  <view>
+						  	<label class="radio">
+						    	<radio value="{{answer.id}}" />{{answer.explain}}
+						  	</label>
+						  </view>
+					</repeat>
+				</radio-group>
+              </view>
+				
+			
+			<view class="weui-article__p" wx:if="{{ShowExplain}}">
+				<view>回答错误</view>
+                  <view>
+                  	<repeat for="{{ reviewitem.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
+                  </view>
+                  <view class="weui-article__section1" wx:if="{{ reviewitem.tips.length }}">
+
+                       <view class="weui-panel__ft">
+                           <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="tip">记忆窍门</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                          </view>
+                      
+
+                          <view wx:if="{{closetip}}">
+                            <repeat for="{{ reviewitem.tips }}" key="id" index="index" item="tip">
+                              <view class="weui-article__p">
+                                {{tip.tip}} 
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                      </view>  
+                         
+                        
+                   </view>
+
+                   <view class="weui-article__section1" wx:if="{{ reviewitem.root.length }}">
+                       <view class="weui-panel__ft">
+                          <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="cigen">词根</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                          </view>
+                          <view wx:if="{{closecigen}}">
+                            <repeat for="{{ reviewitem.root }}" key="id" index="index" item="root">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view>{{root.root_alias?root.root_alias:root.root}} </view>
+                                 </navigator>
+
+                                
+                                <view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                        </view>      
+                    </view>
+
+                    <view class="weui-article__section1" wx:if="{{ reviewitem.sentences.length }}">
+                      <view class="weui-panel__ft">
+                          <view class="weui-cell weui-cell_access weui-cell_link">
+                              <view class="weui-cell__bd" @tap="liju">例句</view>
+                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
+                          </view>
+                           <view wx:if="{{closeliju}}">
+                            <repeat for="{{ reviewitem.sentences }}" key="id" index="index" item="liju">
+                              <view class="weui-article__p">
+                                 <view>{{liju.english}} </view>    
+                                 <view>  {{liju.chinese}} --{{liju.quote}} </view>                               
+                              </view>
+
+                            </repeat>
+                            
+                          </view>
+                      </view>    
+                    </view>
+
+                  <view>
+					<button type="warn" @tap="nextreview">继续学习</button>
+				</view>
+
+            </view>
+
+        </view>
+      </view>
+      
+
+
+       <view wx:if="{{ShowNewWord==false&&ShowReview==false}}">
+      	<view>
+			 <wordhistory></wordhistory>
+		</view>
+      </view>
+
+    </view>
+    <view wx:else>
+      <navigator class="weui-cell weui-cell_access" url="/pages/auth/login">
+        <view class="weui-cell__bd">未登录</view>
+        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+      </navigator>
+    </view>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import api from '@/utils/api';
+  import util from '@/utils/util';
+  import WordHistory from '../../components/wordhistory';
+
+
+  export default class JiDanCi extends wepy.page {
+
+  	components = {
+            wordhistory: WordHistory
+        }
+
+    config = {
+      navigationBarTitleText: '背单词',
+      enablePullDownRefresh: true
+    }
+
+    data = {
+      // 话题数据
+      words: '',
+      wordsTwo: [],
+      ShowExplain:false,
+      ReviewWords: null,
+      closetip: true,
+      closecigen:true,
+      closeliju:true,
+      loggedIn: false,
+      ShowReview:false,
+      ShowNewWord: false,
+      userInfo: null,
+      reviewitem: null,
+      currentdata:'',
+      reviewdata: [],
+      answerlist:[],
+      explain_answer:[],
+      animationData: {},
+      innerAudioContext:''
+
+    }
+
+async onPullDownRefresh() {
+       this.userinfom = wepy.getStorageSync('userinfomini');
+	          if(this.userinfom){
+	          	this.loggedIn =true;
+	          }
+	             		 
+     		let newwordResponse = await api.request({
+	                            url: 'newwords',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                            }
+	                          })
+	          this.words = newwordResponse.data.data;
+	          if(this.words.length){
+	          	//this.answerlist.concat(this.words.explain);
+	          	this.ShowNewWord=true;
+	          }
+	        let wordreviewResponse = await api.request({
+	                            url: 'wordreview',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id
+	  
+	                            }
+	                          });
+    		//this.reviewdata = wordreviewResponse.data.data;
+    		this.reviewdata = wordreviewResponse.data.data;
+    		this.reviewdata.forEach(function (newsitem) {
+
+           	// newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+           	if(newsitem.word_review.status == 1){
+           		newsitem.word_review.next_time="一天后需要复习";
+           	}else if(newsitem.word_review.status ==2){
+				newsitem.word_review.next_time="两天后需要复习";
+			}else if(newsitem.word_review.status ==3){
+				newsitem.word_review.next_time="四天后需要复习";
+			}else if(newsitem.word_review.status ==4){
+				newsitem.word_review.next_time="七天后需要复习";
+			}else if(newsitem.word_review.status ==5){
+				newsitem.word_review.next_time="十五天后需要复习";
+			}
+           	//newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+         	})
+    		if(this.reviewdata.length){
+    			//this.answerlist.concat(this.reviewdata.explain);
+    			this.ShowReview =true;
+    			this.ShowNewWord=false;
+
+    		}
+
+    		let answerlistResponse = await api.request({
+	                            url: 'answerlist',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id
+	  
+	                            }
+	                          });
+    		this.answerlist = answerlistResponse.data;
+
+  		
+        //console.log(`缓存成功` + word);  
+   
+      this.$apply()
+
+      this.getTopic()
+      
+      wepy.stopPullDownRefresh()
+    }
+
+    methods = {
+
+        tip(e){
+            if(this.closetip==false){
+              this.closetip =true;
+            }else{
+              this.closetip =false;
+            }
+        },
+        cigen(e){
+          if(this.closecigen==false){
+              this.closecigen =true;
+            }else{
+              this.closecigen =false;
+            }
+
+        },
+        liju(e){
+          if(this.closeliju==false){
+              this.closeliju =true;
+            }else{
+              this.closeliju =false;
+            }
+
+        },
+      async radioChange(e) {
+          	if(e.detail.value ==this.reviewitem.word_id){
+          		console.log('回答正常')
+          		this.ShowExplain =false;
+          		if(this.reviewdata.length){
+	    		let tmpdata =this.reviewdata.pop();
+	    		this.reviewitem = tmpdata;
+	    		this.autoplaymp3(tmpdata.voice[0].path);
+
+	    		let tmpexplain =""
+    			for (let key in tmpdata.explain) {
+				  tmpexplain = tmpdata.explain[key]
+				  break;
+				}
+    			this.randanswer(tmpdata.word_id, tmpexplain);
+
+    			let reviewupdateResponse = await api.request({
+	                            url: 'viewupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.reviewitem.word_id,
+	                            }
+	                          });
+
+    			this.$apply()
+
+		    	}else{
+
+		    		if(this.words.length){
+			    		let tmpdata =this.words.pop();
+			    		this.currentdata = tmpdata;
+			    		this.wordsTwo.push(tmpdata);
+			    		this.autoplaymp3(tmpdata.voice[0].path);
+
+			    		this.ShowReview =false;
+		    			this.ShowNewWord=true;
+
+			    		let riskupdateResponse = await api.request({
+			                            url: 'riskupdate',
+			                            method: 'POST',
+			                            data: {
+			                              user_id: this.userinfom.id,
+			                              word_id: this.currentdata.word_id,
+			                            }
+			                          })
+
+			    	}else{
+
+			    		this.ShowReview =false;
+    					this.ShowNewWord=false;
+
+			    		//console.log(this.wordsTwo);
+			    	}
+
+			    	this.$apply()
+
+		    		//console.log(this.wordsTwo);
+		    	}
+		    	//console.log("fail");
+		    	this.$apply()
+          	}else{
+          		console.log(this.reviewdata)
+          		this.ShowExplain =true;
+          	}
+		    console.log('radio发生change事件，携带value值为：', e.detail.value)
+		  },
+
+		 async nextreview(e){
+        	this.animation.translate(-500, 0).step({ duration: 500 })
+        	this.animation.translate(0, 0).step({ duration: 500 })
+    		this.animationData = this.animation.export()
+    		this.ShowExplain =false;
+        	if(this.reviewdata.length){
+
+	    		let tmpdata =this.reviewdata.pop();
+	    		this.reviewitem = tmpdata;
+	    		this.autoplaymp3(tmpdata.voice[0].path);
+	    		let tmpexplain =""
+    			for (let key in tmpdata.explain) {
+				  tmpexplain = tmpdata.explain[key]
+				  break;
+				}
+    			this.randanswer(tmpdata.word_id, tmpexplain);
+
+    			let reviewupdateResponse = await api.request({
+	                            url: 'viewupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.reviewitem.word_id,
+	                            }
+	                          });
+
+    			console.log(reviewupdateResponse);
+    			console.log('bug, bug ');
+
+
+	    	}else{
+    		
+	    		if(this.words.length){
+	    		let tmpdata =this.words.pop();
+	    		this.currentdata = tmpdata;
+	    		this.wordsTwo.push(tmpdata);
+	    		this.autoplaymp3(tmpdata.voice[0].path);
+
+	    		this.ShowReview =false;
+    			this.ShowNewWord=true;
+
+	    		let riskupdateResponse = await api.request({
+	                            url: 'riskupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.currentdata.word_id,
+	                            }
+	                          })
+
+		    	}else{
+
+		    		this.ShowReview =false;
+    				this.ShowNewWord=false;
+
+		    		//console.log(this.wordsTwo);
+		    	}
+
+		    	this.$apply()
+
+	    		//console.log(this.wordsTwo);
+	    	}
+	    	//console.log("fail");
+	    	this.$apply()
+	    	this.animationData="";
+
+        },
+
+        async nextword(e){
+        	this.animation.translate(-500, 0).step({ duration: 500 })
+        	this.animation.translate(0, 0).step({ duration: 500 })
+    		this.animationData = this.animation.export()
+
+        	if(this.words.length){
+	    		let tmpdata =this.words.pop();
+	    		this.currentdata = tmpdata;
+	    		this.wordsTwo.push(tmpdata);
+	    		this.autoplaymp3(tmpdata.voice[0].path);
+
+	    		//tmpdata.word_review.next_time = "一小时后需要复习";
+
+    			this.reviewdata.push(tmpdata);
+
+    			console.log(this.reviewdata);
+
+	    		let riskupdateResponse = await api.request({
+	                            url: 'riskupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.currentdata.word_id,
+	                            }
+	                          })
+
+	    		
+	    		//console.log(this.currentdata.voice);
+	    	}else{
+
+	    		if(this.reviewdata.length){
+	    			this.ShowReview =true;
+    				this.ShowNewWord=false;
+    				let tmpdata =this.reviewdata.pop();
+		    		this.reviewitem = tmpdata;
+		    		this.autoplaymp3(tmpdata.voice[0].path);
+		    		let tmpexplain =""
+	    			for (let key in tmpdata.explain) {
+					  tmpexplain = tmpdata.explain[key]
+					  break;
+					}
+					this.randanswer(tmpdata.word_id, tmpexplain);
+
+
+    				this.$apply()
+
+	    		}else{
+	    			this.ShowReview =false;
+    				this.ShowNewWord=false;
+	    		}
+
+	    		//console.log(this.wordsTwo);
+	    	}
+	    	//console.log("fail");
+	    	this.$apply()
+	    	this.animationData="";
+
+        }
+    }
+
+
+        //自动播放单词发音
+    autoplaymp3(voicepath){
+                let path="https://www.jciba.cn/uploads/voice/word/" + voicepath;
+                console.log('path' + path)
+                this.innerAudioContext = wepy.createInnerAudioContext()
+                this.innerAudioContext.autoplay = true
+                this.innerAudioContext.obeyMuteSwitch = false 
+                this.innerAudioContext.src = path
+                this.innerAudioContext.onPlay(() => {
+                    console.log('开始播放')
+                })
+                 
+            }
+
+       playmp3(event){
+                let path="https://www.jciba.cn/uploads/voice/word/" + event.currentTarget.dataset.path;
+
+                this.innerAudioContext = wepy.createInnerAudioContext()
+                this.innerAudioContext.autoplay = true
+                this.innerAudioContext.obeyMuteSwitch = false 
+                this.innerAudioContext.src = path
+                this.innerAudioContext.onPlay(() => {
+                    console.log('开始播放')
+                })
+                 
+            }
+
+     randomSort(a, b) {
+		return Math.random() > 0.5 ? -1 : 1;
+	}		
+
+       
+     randanswer(id, explain){
+     	let explain_arr =[];
+     	explain_arr[0] = { "id" :id , "explain": explain};
+     	explain_arr[1] = this.answerlist[Math.floor(Math.random()*this.answerlist.length)];
+     	explain_arr[2]  = this.answerlist[Math.floor(Math.random()*this.answerlist.length)];
+     	explain_arr[3]  = this.answerlist[Math.floor(Math.random()*this.answerlist.length)];
+
+     	this.explain_answer = explain_arr.sort(this.randomSort);
+     	console.log(explain_arr);
+     	console.log("explain_answer test");
+
+     }
+    // 获取单词数据
+    async getTopic() {
+    	let animation = wepy.createAnimation({
+	      duration: 1000,
+	        timingFunction: 'ease',
+	    })
+
+	    this.animation = animation
+
+	   // this.animation.translate(-100, 0).step({ duration: 1000 })
+    	//this.animationData = this.animation.export()
+	      
+       this.userinfom = wepy.getStorageSync('userinfomini');
+	          if(this.userinfom){
+	          	this.loggedIn =true;
+	          }
+
+	          
+     		let newwordResponse = await api.request({
+	                            url: 'newwords',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                            }
+	                          })
+     		if(newwordResponse){
+     			this.words = newwordResponse.data.data;
+	          if(this.words.length){
+	          	//this.answerlist.concat(this.words.explain);
+	          	this.ShowNewWord=true;
+	          }
+
+     		}
+	          
+	        let wordreviewResponse = await api.request({
+	                            url: 'wordreview',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id
+	  
+	                            }
+	                          });
+	        if(wordreviewResponse){
+	        	this.reviewdata = wordreviewResponse.data.data;
+	    		this.reviewdata.forEach(function (newsitem) {
+
+	           	// newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+	           	if(newsitem.word_review.status == 1){
+	           		newsitem.word_review.next_time="一天后需要复习";
+	           	}else if(newsitem.word_review.status ==2){
+					newsitem.word_review.next_time="两天后需要复习";
+				}else if(newsitem.word_review.status ==3){
+					newsitem.word_review.next_time="四天后需要复习";
+				}else if(newsitem.word_review.status ==4){
+					newsitem.word_review.next_time="七天后需要复习";
+				}else if(newsitem.word_review.status ==5){
+					newsitem.word_review.next_time="十五天后需要复习";
+				}
+	           	//newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+	         	})
+	    		if(this.reviewdata.length){
+	    			//this.answerlist.concat(this.reviewdata.explain);
+	    			this.ShowReview =true;
+	    			this.ShowNewWord=false;
+
+	    		}
+	        }
+    		//this.reviewdata = wordreviewResponse.data.data;
+    		
+
+    		let answerlistResponse = await api.request({
+	                            url: 'answerlist',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id
+	  
+	                            }
+	                          });
+    		if(answerlistResponse){
+    			this.answerlist = answerlistResponse.data;
+    		}
+    		
+
+  		
+        //console.log(`缓存成功` + word);  
+   
+      	//this.$apply()
+
+    	if(this.ShowReview){
+    		if(this.reviewdata.length){
+    			let tmpdata =this.reviewdata.pop();
+    			this.reviewitem = tmpdata;
+    			this.autoplaymp3(tmpdata.voice[0].path);
+
+
+    			//this.reviewitem.answer.
+    			let tmpexplain =""
+    			for (let key in tmpdata.explain) {
+				  tmpexplain = tmpdata.explain[key];
+				  break;
+				}
+    			this.randanswer(tmpdata.word_id, tmpexplain);
+
+    			let reviewupdateResponse = await api.request({
+	                            url: 'viewupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.reviewitem.word_id,
+	                            }
+	                          });
+
+    			this.$apply()
+    			//console.log(this.reviewitem);
+    		}
+    	}
+
+    	if(this.ShowNewWord){
+    		if(this.words.length){
+    		let tmpdata =this.words.pop();
+    		this.currentdata = tmpdata;
+    		this.autoplaymp3(tmpdata.voice[0].path);
+
+    		//tmpdata.word_review.next_time = "一小时后需要复习";
+
+    		this.reviewdata.push(tmpdata);
+      		//console.log(this.reviewdata);
+
+    		let riskupdateResponse = await api.request({
+	                            url: 'riskupdate',
+	                            method: 'POST',
+	                            data: {
+	                              user_id: this.userinfom.id,
+	                              word_id: this.currentdata.word_id,
+	                            }
+	                          });
+
+
+
+	    		//console.log(tmpdata.voice[0].path);
+	    		//console.log(tmpdata);
+	    	}
+
+	    	this.animation.translate(0, 0).step({ duration: 1000 })
+	    	this.animationData = this.animation.export()
+
+	    	//console.log("fail");
+	    	this.$apply()
+    	}
+      //let words = wepy.getStorageSync(word) 设置缓存
+     
+    }
+
+   async onLoad(options) {
+
+
+      this.getTopic()
+
+      
+    }
+  }
+</script>

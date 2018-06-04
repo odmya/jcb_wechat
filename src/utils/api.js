@@ -1,7 +1,7 @@
 import wepy from 'wepy'
 
 // 服务器接口地址
-const host = 'https://www.jciba.cn/api'
+const host = 'http://www.sbguh.com/api'
 
 // 普通请求
 const request = async (options, showLoading = true) => {

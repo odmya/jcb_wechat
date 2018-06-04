@@ -1,0 +1,202 @@
+<style>
+
+.top-margin{
+  margin:50px;
+}
+.weui-article__p{
+
+    text-align: left;
+    font-size:12px;
+    padding:0px 5px;
+    color:blue;
+    text-decoration: underline;
+}
+.roottext{
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    white-space:nowrap; 
+    }
+.navbar .weui-tab__content{padding-top:5px;}
+</style>
+<template>
+
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                         <repeat for="{{ wordrisklist }}" key="id" index="index" item="wordrisk">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/query?word={{ wordrisk.word }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view> {{wordrisk.word}} </view>
+                                    <view class="weui-article__p">
+                                         <repeat for="{{ wordrisk.explain }}" key="id" index="cixing" item="explain">{{cixing}} {{explain}}  </repeat>
+                                    </view>
+                                 </navigator>
+                              </view>
+
+                         </repeat>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                        
+                        <repeat for="{{ wordreviewlist }}" key="id" index="index" item="wordreview">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/query?word={{ wordreview.word }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view> {{wordreview.word}} </view>
+                                    <view class="weui-article__p">
+                                         <repeat for="{{ wordreview.explain }}" key="id" index="cixing" item="explain">{{cixing}} {{explain}}  </repeat>
+                                    </view>
+                                 </navigator>
+                              </view>
+
+                        </repeat>
+
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+                              <view wx:if="{{setbundle}}">
+      
+                                    <view class="weui-article__p">
+                                         <picker @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
+                                              <button type="default">选择生词本</button>
+                                          </picker>
+                                    </view>
+          
+
+                              </view>
+                              <view wx:else>
+                                <view  >
+  
+                                        <view class="weui-cells__title">设置</view>
+
+                                        <view class="weui-cells weui-cells_after-title">
+                                          <view class="weui-cells__title">{{wordbundle.level_base}}</view>
+                                          <view class="weui-cell weui-cell_input">
+                                              <view class="weui-cell__hd">
+                                                  <view class="weui-label">每天单词</view>
+                                              </view>
+                                              <view class="weui-cell__bd">
+                                                  <input class="weui-input" value="{{wordbundle.maxsize}}" placeholder="请输入单词数" />
+                                              </view>
+                                          </view>
+
+                                          <view class="weui-btn-area">
+                                              <button class="weui-btn" type="primary" @tap="updatebundle">确定</button>
+                                          </view>
+                                          <view class="weui-btn-area">
+                                              <button class="weui-btn" type="warn" @tap="deletebundle">删除</button>
+                                          </view>
+
+                                        </view>
+                                        
+                                </view>
+                              </view>
+
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '@/utils/api'
+    const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
+
+    export default class WordHistory extends wepy.page {
+
+
+        data = {
+            tabs: ['今日新单词', '复习中单词', '设置'],
+            activeIndex: 0,
+            sliderOffset: 0,
+            sliderLeft: 0,
+            qianzhui:'',
+            houzhui:'',
+            cizhui:'',
+            wordrisklist:'',
+            wordreviewlist:'',
+            wordbundle: '',
+            setbundle:false,
+            userinfom:'',
+            bundles:[],
+            index: 0
+        };
+
+        props = {
+          userInfo: ''
+      };
+
+        methods = {
+            tabClick (e) {
+                this.sliderOffset = e.currentTarget.offsetLeft;
+                this.activeIndex = e.currentTarget.id;
+            }
+        }
+
+        async getRoots(){
+
+            let wordrisklistResponse = await api.request({
+            url: 'wordrisklist',
+            data: {
+              user_id: this.userinfom.id
+            }
+          });
+           
+            
+          this.wordrisklist = wordrisklistResponse.data.data;
+          this.$apply()
+
+          let wordreviewlistResponse = await api.request({
+            url: 'wordreviewlist',
+            data: {
+              user_id: this.userinfom.id
+            }
+          });
+          this.wordreviewlist = wordreviewlistResponse.data.data;
+          this.$apply()
+          let wordsetttingResponse = await api.request({
+            url: 'wordsetting',
+            data: {
+              user_id: this.userinfom.id
+            }
+          });
+          let wordsettting = wordsetttingResponse;
+          if(wordsettting.status_code){
+            this.wordbundle = wordsettting.data.data
+          }else{
+            this.setbundle =true;
+            let bundlelistResponse = await api.request({
+            url: 'bundlelist'
+            });
+            let setbundle = bundlelistResponse.data.level_bases;
+            let tmplist =[];
+            console.log(setbundle)
+            setbundle.forEach(function (newsitem) {
+              tmplist.push(newsitem.level_bases);
+              
+            })
+            this.bundles = tmplist;
+          }
+          
+          this.$apply()
+          
+
+        }
+
+        async onLoad () {
+            let res = await wepy.getSystemInfo();
+            this.userinfom = wepy.getStorageSync('userinfomini');
+            this.getRoots()
+
+            this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
+            this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
+        }
+    }
+</script>

@@ -27,7 +27,10 @@ page{
   text-align: left;
   font-size: 14px;
 }
-
+.timediff{
+  font-size:9px;
+  color: #888888;
+}
 </style>
 
 <script>
@@ -42,12 +45,15 @@ export default class extends wepy.app {
       'pages/auth/register',
       'pages/words/query',
       'pages/words/cigen',
+      'pages/words/jidanci',
+      'pages/words/cigenlist',
+      'pages/news/news',
       'pages/user'
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'LaraBBS',
+      navigationBarTitleText: '记词吧',
       navigationBarTextStyle: 'black'
     },
     tabBar: {
@@ -56,7 +62,22 @@ export default class extends wepy.app {
         text: '首页',
         iconPath: 'images/home1.png',
         selectedIconPath: 'images/home2.png'
-      }, {
+      },
+      {
+        pagePath: 'pages/words/jidanci',
+        text: '背单词',
+        iconPath: 'images/jdc.png',
+        selectedIconPath: 'images/jdc1.png'
+      }
+      ,
+
+      {
+        pagePath: 'pages/words/cigenlist',
+        text: '词根',
+        iconPath: 'images/dictionary1.png',
+        selectedIconPath: 'images/dictionary2.png'
+      }
+      , {
         pagePath: 'pages/user',
         text: '我的',
         iconPath: 'images/user1.png',

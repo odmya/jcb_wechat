@@ -12,7 +12,7 @@
        <form bindsubmit="submit">
         <view class="weui-toptips weui-toptips_warn" wx:if="{{ errorMessage }}">{{ errorMessage }}</view>
 
-        <view class="weui-cells__title">Larabbs 手机注册</view>
+        <view class="weui-cells__title">记词吧 手机注册</view>
 
         <!-- 手机号  -->
         <view class="weui-cells__title {{ errors.phone ? 'weui-cell_warn' : ''}}">手机号</view>
@@ -27,6 +27,8 @@
             </view>
           </view>
         </view>
+        <view wx:if="{{ sendsucess }}" class="weui-cells__tips error-message">验证码发送成功！</view>
+
         <view wx:if="{{ errors.phone }}" class="weui-cells__tips error-message">{{errors.phone[0]}}</view>
 
         <!-- 短信验证码  -->
@@ -76,19 +78,6 @@
         </view>
       </form>
 
-      <!-- 验证码输入模态框 -->
-      <modal class="modal" hidden="{{ captchaModalHidden }}" no-cancel bindconfirm="sendVerificationCode">
-        <view wx:if="{{ errors.captchaValue }}" class="weui-cells__tips error-message">{{ errors.captchaValue[0] }}</view>
-        <view class="weui-cell weui-cell_input weui-cell_vcode">
-          <view class="weui-cell__bd">
-            <input class="weui-input" placeholder="图片验证码" @input="bindCaptchaCodeInput"/>
-          </view>
-          <view class="weui-cell__ft">
-            <image class="weui-vcode-img" @tap="tapCaptchaCode" src="{{ captcha.imageContent }}" style="width: 100px"></image>
-          </view>
-        </view>
-      </modal>
-
     </view>
   </view>
 </template>
@@ -114,6 +103,9 @@
       captcha: {},
       // 表单错误
       errors: {},
+      codemsg:'',
+      sendsucess: false,
+
       // 短信验证码 key 及过期时间
       verificationCode: {}
     }
@@ -160,7 +152,8 @@
           method: 'POST',
           data: formData
         })
-
+//console.log(formData);
+console.log(registerResponse);
         // 验证码错误
         if (registerResponse.statusCode === 401) {
           this.errors.verification_code = ['验证码错误']
@@ -265,7 +258,7 @@
     // 获取图片验证码
     async getCaptchaCode() {
       this.errors.phone = null
-
+      this.captchaModalHidden =true;
       // 判断手机号是否正确
       if (!(/^1[34578]\d{9}$/.test(this.phone))) {
         this.errors.phone = ['请输入正确的手机号']
@@ -275,6 +268,7 @@
 
       try {
         // 调用发送验证码接口，参数为手机号
+        /*
         let captchaResponse = await api.request({
           url: 'captchas',
           method: 'POST',
@@ -282,7 +276,7 @@
             phone: this.phone
           }
         })
-
+      
         // 表单错误
         if (captchaResponse.statusCode === 422) {
           this.errors = captchaResponse.data.errors
@@ -301,6 +295,40 @@
           this.captchaModalHidden = false
           this.$apply()
         }
+        */
+        let codeResponse = await api.request({
+          url: 'sendmsg',
+          method: 'POST',
+          data: {
+            phone: this.phone
+          }
+        })
+
+          // 记录 key 和 过期时间
+        if (codeResponse.statusCode === 201) {
+            this.verificationCode = {
+              key: codeResponse.data.key,
+              expiredAt: Date.parse(codeResponse.data.expired_at)
+            }
+
+            // 关闭modal
+            this.captchaModalHidden = true
+            // 手机输入框 disabled
+            this.phoneDisabled = true
+            // 清空报错信息
+            this.errors = {}
+            this.$apply()
+          }
+       // this.sendsucess=true,
+        wepy.showToast({
+            title: '验证码发送成功！请查收.',
+            icon: 'none',
+            duration: 2000
+          })
+        this.$apply()
+
+        
+
       } catch (err) {
         console.log(err)
         wepy.showModal({

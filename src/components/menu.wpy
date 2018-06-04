@@ -1,0 +1,79 @@
+<style>
+.searchbar-result{
+    margin-top: 0;
+    font-size: 14px;
+}
+.searchbar-result:before{
+    display: none;
+}
+.weui-cell{
+    padding: 2px 0px;
+}
+
+.menufooter{
+     position:fixed; 
+     bottom:0;
+     width: 100%;
+     background-color: #F8F8F8;
+     
+}
+.changezindexcss{
+
+      
+}
+.currectzindexcss{
+
+      z-index: -1;
+}
+.avatarhome{
+      width: 26px;
+  height: 26px;
+}
+.footerbottom{
+    font-size: 9px;
+    color:#1296db;
+
+}
+</style>
+<template>
+
+<view class="page__hd menufooter" >
+    <view class="weui-cell weui-cell_access weui-cell_link" style="padding:2px 0 0 0;">
+        <navigator class="weui-cell__bd" url="/pages/index" open-type="switchTab" hover-class="weui-cell_active">
+            <view >
+                <view ><image class="avatarhome"  src="../images/home2.png" /></view>
+                <view class='footerbottom'>首页</view>
+            </view>
+            
+        </navigator>
+
+        <navigator class="weui-cell__bd" url="/pages/words/cigenlist" open-type="switchTab" hover-class="weui-cell_active">
+            <view >
+                <view ><image class="avatarhome"  src="../images/dictionary2.png" /></view>
+                <view class="footerbottom">词根</view>
+            </view>
+            
+        </navigator>
+        
+    </view>  
+</view>
+
+</template>
+
+<script>
+    import wepy from 'wepy';
+
+    export default class Menufoot extends wepy.page {
+
+        data = {
+
+            page: 1
+            
+        };
+
+
+
+
+    
+    }
+</script>

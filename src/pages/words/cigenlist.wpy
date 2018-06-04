@@ -1,0 +1,137 @@
+<style lang="less">
+.navbar {
+    .page,
+    .page__bd{
+        height: 100%;
+    }
+    .page__bd{
+        padding-bottom: 0;
+    }
+    .weui-tab__content{
+        padding-top: 60px;
+        text-align: center;
+    }
+}
+.top-margin{
+  margin:50px;
+}
+.weui-article__p{
+
+    text-align: left;
+    font-size:12px;
+    padding:0px 5px;
+    color:blue;
+    text-decoration: underline;
+}
+.roottext{
+    overflow:hidden; 
+    text-overflow:ellipsis;
+    white-space:nowrap; 
+    }
+.navbar .weui-tab__content{padding-top:5px;}
+</style>
+<template>
+
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                         <repeat for="{{ qianzhui }}" key="id" index="index" item="qz">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ qz.id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view>{{qz.name}} </view>
+                                 </navigator>
+                              </view>
+
+                         </repeat>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                        
+                        <repeat for="{{ houzhui }}" key="id" index="index" item="hz">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ hz.id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view>{{hz.name}} </view>
+                                 </navigator>
+                              </view>
+
+                         </repeat>
+
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+                        <repeat for="{{ cizhui }}" key="id" index="index" item="cz">
+                              <view class="weui-article__p">
+                                 <navigator url="/pages/words/cigen?id={{ cz.id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                   <view>{{cz.name}} </view>
+                                 </navigator>
+                              </view>
+
+                         </repeat>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import api from '@/utils/api'
+    const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
+
+    export default class Toast extends wepy.page {
+
+
+        data = {
+            tabs: ['前缀', '后缀', '词根'],
+            activeIndex: 0,
+            sliderOffset: 0,
+            sliderLeft: 0,
+            qianzhui:'',
+            houzhui:'',
+            cizhui:''
+        };
+
+        methods = {
+            tabClick (e) {
+                this.sliderOffset = e.currentTarget.offsetLeft;
+                this.activeIndex = e.currentTarget.id;
+            }
+        }
+
+        async getRoots(){
+
+            let qianzhuiResponse = await api.request({
+            url: 'roots/list/0'
+          });
+          this.qianzhui = qianzhuiResponse.data.roots;
+
+          let houzhuiResponse = await api.request({
+            url: 'roots/list/1'
+          });
+          this.houzhui = houzhuiResponse.data.roots;
+
+          let cizhuiResponse = await api.request({
+            url: 'roots/list/2'
+          });
+          this.cizhui = cizhuiResponse.data.roots;
+          this.$apply()
+          //console.log(this.qianzhui)
+
+        }
+
+        async onLoad () {
+            let res = await wepy.getSystemInfo();
+            this.getRoots()
+
+            this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
+            this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
+        }
+    }
+</script>

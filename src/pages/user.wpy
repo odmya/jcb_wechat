@@ -37,6 +37,8 @@
         let userResponse = await api.authRequest('user')
         this.userInfo = userResponse.data
         this.loggedIn = true
+        //console.log(userResponse.data);
+        wepy.setStorageSync('userinfomini',userResponse.data);
         this.$apply()
       }
     }
@@ -50,6 +52,7 @@
           if (logoutResponse.statusCode === 204) {
             this.loggedIn = false
             this.userInfo = null
+            wepy.setStorageSync('userinfomini',"");
             this.$apply()
           }
         } catch (err) {

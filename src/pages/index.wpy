@@ -3,19 +3,22 @@
 <searchbar></searchbar>
   <view class="page__bd word-top">
     <view class="weui-panel weui-panel_access">
-      <view class="weui-panel__hd">话题列表</view>
+      <view class="weui-panel__hd">News</view>
       <view class="weui-panel__bd">
-        <repeat for="{{ topics }}" key="id" index="index" item="topic">
-          <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+        <repeat for="{{ news }}" key="id" index="index" item="newsitem">
+          <navigator url="/pages/news/news?id={{ newsitem.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
             <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-              <image class="weui-media-box__thumb" src="https://lccdn.phphub.org/uploads/avatars/3995_1516760409.jpg?imageView2/1/w/200/h/200" />
+              <image class="weui-media-box__thumb" src="{{domain}}/uploads/{{newsitem.image}}" />
             </view>
             <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-              <view class="weui-media-box__title">{{ topic.title }}</view>
-              <view class="weui-media-box__desc">{{ topic.body }}</view>
+              <view class="weui-media-box__desc">{{ newsitem.title }}</view>
+              <view class="weui-media-box__info__meta timediff">{{ newsitem.updated_at_diff }}</view>
             </view>
           </navigator>
         </repeat>
+        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+          <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+        </view>
       </view>
     </view>
   </view>
@@ -26,8 +29,14 @@
 
 //引入组件文件
     import Searchbar from '../components/searchbar';
+    import api from '@/utils/api';
+    import util from '@/utils/util';
 
   export default class Index extends wepy.page {
+
+     config = {
+        enablePullDownRefresh: true
+      }
 
      components = {
             searchbar: Searchbar
@@ -35,23 +44,70 @@
 
     // 可用于页面模板绑定的数据
     data = {
-      topics: [{
-        id: 1,
-        title: '测试1',
-        body: 'larabbs 测试内容1'
-      }, {
-        id: 2,
-        title: '测试2',
-        body: 'larabbs 测试内容2'
-      }, {
-        id: 3,
-        title: '测试3',
-        body: 'larabbs 测试内容3'
-      }, {
-        id: 4,
-        title: '测试4',
-        body: 'larabbs 测试内容4'
-      }]
+      domain:'https://www.jciba.cn',
+      page: 1,
+      noMoreData: false,
+      news:[]
+    }
+
+    async onPullDownRefresh() {
+      this.noMoreData = false
+      this.page = 1
+      await this.getNews(1,true)
+      wepy.stopPullDownRefresh()
+    }
+
+    async onReachBottom () {
+      // 如果没有更多内容，直接返回
+      if (this.noMoreData) {
+        return
+      }
+      this.page = this.page + 1
+      await this.getNews(this.page)
+      this.$apply()
+    }
+
+
+    async getNews(page = 1, reset = false){
+
+      try {
+          let newsResponse = await api.request({
+            url: 'news',
+            data: {
+            page: page
+          }
+          });
+          let news = newsResponse.data.data;
+
+          news.forEach(function (newsitem) {
+            newsitem.updated_at_diff = util.diffForHumans(newsitem.updated_at)
+          })
+          //console.log(words); 
+        //  wepy.setStorageSync(word, words) 设置缓存
+
+          this.news = reset ? news : this.news.concat(news);
+          let pagination = newsResponse.data.meta.pagination
+
+          // 根据分页设置是否还有更多数据
+          if (pagination.current_page === pagination.total_pages) {
+            this.noMoreData = true
+          }
+
+         // console.log(this.news); 
+          this.$apply();
+        } catch (err) {
+          //console.log(err)
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请稍后'
+          })
+        }
+
+    }
+
+    onLoad(options) {
+      this.getNews()
+      
     }
          
   }

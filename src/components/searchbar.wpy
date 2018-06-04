@@ -36,7 +36,7 @@
                 <view class="weui-search-bar__form">
                     <view class="weui-search-bar__box">
                         <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
-                        <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}" @input="inputTyping" />
+                        <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}"  @input="inputTyping" />
                         <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
                             <icon type="clear" size="14"></icon>
                         </view>
@@ -46,11 +46,11 @@
                         <view class="weui-search-bar__text">搜索</view>
                     </label>
                 </view>
-                <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="searchword">搜索</view>
+                <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
             </view>
             <view class="weui-cells searchbar-result" wx:if="{{searchresult.length > 0}}">
                 <repeat for="{{ searchresult }}" key="id" index="index" item="word">
-                    <navigator url="/pages/words/query?word={{ word.word }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                    <navigator url="/pages/words/query?word={{ word.word }}" open-type="redirect" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
                         <view class="weui-cell__bd">
 
                             <view class="weui-media-box__info__meta">{{ word.word }} {{ word.explain_china.explain }}</view>
@@ -87,37 +87,46 @@
       async inputVal (newValue, oldValue) {
             if(newValue.length>0){
                // this.changezindex ='changezindexcss';
-                try {
+                let searchresult = wepy.getStorageSync('search'+newValue)
+                if (!searchresult) {
+                        try {
 
-                    this.searchresult=[];
-                       // 请求话题列表接口
-                        let wordResponse = await api.request({
-                          url: 'wordsearch',
-                          method: 'POST',
-                          data: {
-                            page: 1,
-                            query: newValue,
-                            include:"explain"
-                          }
-                        })
-                        let searchresult = wordResponse.data.data;
-                        // 将数据合并到 this.topics
-                        this.searchresult = searchresult;
-                        this.$apply()
-                } catch (err) {
-                  wepy.showModal({
-                    title: '提示',
-                    content: '服务器错误，请联系管理员'
-                  })
+                        this.searchresult=[];
+                           // 请求话题列表接口
+                            let wordResponse = await api.request({
+                              url: 'wordsearch',
+                              method: 'POST',
+                              data: {
+                                page: 1,
+                                query: newValue,
+                                include:"explain"
+                              }
+                            })
+                            searchresult = wordResponse.data.data;
+                            wepy.setStorageSync('search'+newValue, searchresult)
+                            // 将数据合并到 this.topics
+                            //this.searchresult = searchresult;
+                            //this.$apply()
+                            } catch (err) {
+                              wepy.showModal({
+                                title: '提示',
+                                content: '服务器错误，请联系管理员'
+                              })
+                            }
+                 console.log(`缓存成功`+ 'search' + newValue);           
                 }
+                this.searchresult = searchresult
+                this.$apply()
+                //
 
             }else{
                 this.searchresult=[];
+
                // this.changezindex ='currectzindexcss';
             }
             
            // console.log("test" + this.changezindex);
-          console.log(`num value: ${oldValue} -> ${newValue}`);
+          
       }
   }
 
@@ -156,6 +165,10 @@
            
             showInput () {
                 this.inputShowed = true;
+                 let searchresult = wepy.getStorageSync('searchresultcache');
+                    this.searchresult = searchresult;
+                    this.$apply()
+
             },
             hideInput () {
                 this.inputVal = '';
@@ -168,10 +181,12 @@
                 this.searchresult=[];
             },
 
+
            inputTyping (e) {
                 this.inputShowed = true;
                 this.queryword = e.detail.value;
                 this.inputVal = e.detail.value;
+
 
 
             }
