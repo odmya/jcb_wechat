@@ -47,6 +47,15 @@
             
         </navigator>
 
+        <navigator class="weui-cell__bd" url="/pages/words/jidanci" open-type="switchTab" hover-class="weui-cell_active">
+            <view >
+                <view ><image class="avatarhome"  src="../images/jdc1.png" /></view>
+                <view class='footerbottom'>背单词</view>
+            </view>
+            
+        </navigator>
+
+
         <navigator class="weui-cell__bd" url="/pages/words/cigenlist" open-type="switchTab" hover-class="weui-cell_active">
             <view >
                 <view ><image class="avatarhome"  src="../images/dictionary2.png" /></view>
@@ -61,19 +70,11 @@
 </template>
 
 <script>
-    import wepy from 'wepy';
-
+    import wepy from 'wepy'
     export default class Menufoot extends wepy.page {
 
         data = {
-
-            page: 1
-            
-        };
-
-
-
-
-    
+            page: 1 
+        }
     }
 </script>

@@ -1,0 +1,266 @@
+<style lang="less">
+.login-wrap {
+  margin-top: 50px;
+}
+.tips{
+  text-align: left;
+  font-size:11px;
+}
+</style>
+<template>
+
+  <view wx:if="{{setbundle}}">
+
+  <view class="weui-article__p">
+    <picker @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
+      <button type="default">选择生词本</button>
+    </picker>
+  </view>
+
+</view>
+<view wx:else>
+                    <view>
+
+                        <view class="weui-cells__title">设置</view>
+                        
+                        <view class="weui-cells weui-cells_after-title">
+
+                          <view class="weui-cells__title">
+
+                            <picker class="wepy-calendar-date" @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
+                              {{wordbundle.level_base}}
+                              
+                              </picker>
+
+                          </view>
+                          <view class="weui-cell weui-cell_input">
+                            <view class="weui-cell__hd">
+                              <view class="weui-label">每天单词</view>
+                            </view>
+                            <view class="weui-cell__bd">
+                              <input class="weui-input" value="{{maxsize}}" placeholder="请输入单词数" @input="inputTyping"/>
+                            </view>
+                          </view>
+
+                          <view class="weui-btn-area">
+                              <view class="tips">
+                                温馨提示: 小学生建议每天1-3个新单词，每个新单词默认需要复习7次，历时十五天。 如每天三个单词，十五天后每天需要每天复习3*15=45个单词，贵在坚持！复习比学习新单词更重要。
+                              </view>
+                          </view>
+
+                          <view class="weui-btn-area">
+                            <button class="weui-btn" type="primary" @tap="updatebundle">确定</button>
+                          </view>
+  
+
+                        </view>
+                    </view>
+</view>
+                   
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  export default class Login extends wepy.page {
+    config = {
+      navigationBarTitleText: '登录'
+    }
+    data = {
+      // 用户名
+      wordbundle: '',
+      setbundle:false,
+      maxsize: '',
+      userinfomation:'',
+      bundles:'',
+      maxsize:'',
+      valuelist: ''
+
+    }
+    methods = {
+
+      async bindPickerChange(e){
+              this.userinfomation = wepy.getStorageSync('userinfomini')
+              console.log("user_id: " + this.userinfomation.id +'level_base_id'+ this.valuelist[e.detail.value])
+              try{
+                let newbundleResponse = await api.request({
+                url: 'newbundle',
+                method: 'POST',
+                data: {
+                  user_id: this.userinfomation.id,
+                  level_base_id: this.valuelist[e.detail.value],
+                }
+              })
+
+
+              this.wordbundle = newbundleResponse.data.data
+              this.maxsize = this.wordbundle.maxsize
+              this.setbundle =false
+            }catch(err){
+
+                     this.loggedIn = false
+               this.userInfo = null
+               this.setbundle =true
+               wepy.setStorageSync('userinfomini',"")
+
+            }
+              console.log('picker发送选择改变，携带值为', e.detail.value)
+
+              console.log('name : ', this.valuelist[e.detail.value])
+
+              if (this.wordbundle.statusCode === 422) {
+                   this.loggedIn = false
+               this.userInfo = null
+               this.setbundle =true
+               wepy.setStorageSync('userinfomini',"")
+               //his.$apply()
+                  }
+
+              
+              this.$apply()
+            },
+
+            inputTyping(e){
+              this.maxsize = e.detail.value
+            },
+
+            //更新单词本
+            async updatebundle(e){
+
+                //console.log("user_id: " + this.userinfomation.id +'bundle_id'+ this.wordbundle.id + 'maxsize:'+ this.maxsize)
+                let updatebundleResponse = await api.request({
+                  url: 'updatebundle',
+                  method: 'POST',
+                  data: {
+                    user_id: this.userinfomation.id,
+                    bundle_id: this.wordbundle.id,
+                    maxsize: this.maxsize
+                  }
+                })
+                this.wordbundle = updatebundleResponse.data.data
+                this.maxsize = this.wordbundle.maxsize
+
+                this.$apply() 
+            
+
+                wepy.navigateBack()
+
+            },
+      // 绑定用户名 input 变化
+
+      // 表单提交
+
+      async submit() {
+        // 提交时重置错误
+        this.error = false
+        this.errorMessage = ''
+
+        if (!this.username || !this.password) {
+          this.errorMessage = '请填写账户名和密码'
+          return
+        }
+
+        // 获取用户名和密码
+        let params = {
+          username: this.username,
+          password: this.password
+        }
+
+        try {
+          let authResponse = await api.login(params)
+
+          // 请求结果为 401 说明用户名和密码错误，显示错误提示
+          if (authResponse.statusCode === 401) {
+            this.error = true
+            this.errorMessage = authResponse.data.message
+            this.$apply()
+          }
+
+          // 201 为登录正确，返回上一页
+          if (authResponse.statusCode === 201) {
+            wepy.navigateBack()
+          }
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+    }
+
+
+
+    async onShow() {
+        try{
+            this.userinfomation = wepy.getStorageSync('userinfomini')
+            if(this.userinfomation.id ==false){
+              let accessToken = wepy.getStorageSync('access_token')
+
+                  // Token 存在则说明已登录
+                  if (accessToken) {
+                    // 测试 authRequest 接口
+                    let userResponse = await api.authRequest('user')
+                    this.userinfomation = userResponse.data
+                    this.loggedIn = true
+                    console.log('测试登录接口')
+                    console.log(userResponse.data)
+                    wepy.setStorageSync('userinfomini',userResponse.data)
+                    this.$apply()
+                }
+            }
+
+
+            if(this.wordbundle ===''){
+                 let wordsetttingResponse = await api.request({
+                url: 'wordsetting',
+                data: {
+                  user_id: this.userinfomation.id
+                }
+              })
+              let wordsettting = wordsetttingResponse
+              if(wordsettting.data.data){
+                this.setbundle =false
+                this.wordbundle = wordsettting.data.data
+                this.maxsize = this.wordbundle.maxsize
+              }else{
+                this.setbundle =true
+              }
+
+                let bundlelistResponse = await api.request({
+                  url: 'bundlelist'
+                })
+                let setbundledata = bundlelistResponse.data.level_bases
+                let tmplist =[]
+                let valuelist =[]
+                
+                setbundledata.forEach(function (newsitem) {
+                  //tmplist[newsitem.id] = newsitem.level_bases
+                  tmplist.push(newsitem.level_bases)
+                  valuelist.push(newsitem.id)
+                  
+              })
+              this.bundles = tmplist
+              this.valuelist = valuelist
+
+              this.$apply()
+
+              
+
+            }
+
+
+          }catch(err){
+
+          }
+          console.log('wordbundle: '+ this.wordbundle.level_base)
+          console.log('测试单词设置')
+          this.$apply() 
+
+
+        
+      }
+  }
+</script>

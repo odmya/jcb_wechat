@@ -1,8 +1,15 @@
 <template>
   <view class="page">
     <view wx:if="{{ loggedIn }}">
-      已登录 name:{{ userInfo.name }}
-      <button type="warn" @tap="logout">退出登录</button>
+        <view>已登录成功， {{ userInfo.name }}欢迎您</view>
+      
+        <navigator class="weui-cell__bd" url="/pages/words/jidanci" open-type="switchTab" hover-class="weui-cell_active">
+            <view >
+                <button type="warn" >点击开始背诵单词</button>
+            </view>
+            
+        </navigator>
+
     </view>
     <view wx:else>
       <navigator class="weui-cell weui-cell_access" url="/pages/auth/login">
@@ -37,8 +44,8 @@
         let userResponse = await api.authRequest('user')
         this.userInfo = userResponse.data
         this.loggedIn = true
-        //console.log(userResponse.data);
-        wepy.setStorageSync('userinfomini',userResponse.data);
+        //console.log(userResponse.data)
+        wepy.setStorageSync('userinfomini',userResponse.data)
         this.$apply()
       }
     }
@@ -52,7 +59,7 @@
           if (logoutResponse.statusCode === 204) {
             this.loggedIn = false
             this.userInfo = null
-            wepy.setStorageSync('userinfomini',"");
+            wepy.setStorageSync('userinfomini',"")
             this.$apply()
           }
         } catch (err) {

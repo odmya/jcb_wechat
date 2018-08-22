@@ -28,9 +28,9 @@
   import wepy from 'wepy'
 
 //引入组件文件
-    import Searchbar from '../components/searchbar';
-    import api from '@/utils/api';
-    import util from '@/utils/util';
+    import Searchbar from '../components/searchbar'
+    import api from '@/utils/api'
+    import util from '@/utils/util'
 
   export default class Index extends wepy.page {
 
@@ -76,16 +76,16 @@
             data: {
             page: page
           }
-          });
-          let news = newsResponse.data.data;
+          })
+          let news = newsResponse.data.data
 
           news.forEach(function (newsitem) {
             newsitem.updated_at_diff = util.diffForHumans(newsitem.updated_at)
           })
-          //console.log(words); 
+          //console.log(words) 
         //  wepy.setStorageSync(word, words) 设置缓存
 
-          this.news = reset ? news : this.news.concat(news);
+          this.news = reset ? news : this.news.concat(news)
           let pagination = newsResponse.data.meta.pagination
 
           // 根据分页设置是否还有更多数据
@@ -93,8 +93,8 @@
             this.noMoreData = true
           }
 
-         // console.log(this.news); 
-          this.$apply();
+         // console.log(this.news) 
+          this.$apply()
         } catch (err) {
           //console.log(err)
           wepy.showModal({

@@ -18,7 +18,7 @@ image{
  padding: 5px;
 }
 .top-margin{
-  margin:50px 10px 5px 10px;
+  margin:50px 10px 100px 10px;
 }
 .page__title{
   font-size:15px;
@@ -39,6 +39,9 @@ image{
   text-decoration: underline;
   font-size: 14px;
 }
+.fixhigh{
+  margin-bottom: 50px;
+}
 .page__desc img{
 width:100%;
 height: 100%;
@@ -49,9 +52,12 @@ height: 100%;
     <view class="page top-margin">
       <view class="page__title">{{ news.title }}</view>
       <view class="weui-article__p">{{ news.created_at }}(Beijing Time) {{ news.author }}</view>
-      <view class="page__desc">
+      <view class="page__desc ">
             <rich-text nodes="{{news.description}}"></rich-text> 
-      </view>             
+      </view>   
+      <view style="text-align:center">
+                <button class="weui-btn mini-btn" type="primary" style="margin-bottom: 80px" open-type="share" size="mini">分享给朋友</button>
+      </view>           
     </view>
     <menufoot></menufoot>
 </template>
@@ -59,8 +65,8 @@ height: 100%;
 <script>
   import wepy from 'wepy'
   import api from '@/utils/api'
-  import Searchbar from '../../components/searchbar2';
-  import Menufoot from '../../components/menu';
+  import Searchbar from '../../components/searchbar2'
+  import Menufoot from '../../components/menu'
   export default class CigenShow extends wepy.page {
     components = {
             searchbar: Searchbar,
@@ -88,7 +94,7 @@ height: 100%;
           let newsResponse = await api.request({
             url: 'news/show/' + id,
           })
-          news = newsResponse.data.data;
+          news = newsResponse.data.data
           //wepy.setStorageSync("cigen"+id, cigen) 设置缓存
 
 
@@ -98,11 +104,23 @@ height: 100%;
             content: '服务器错误，请联系管理员'
           })
         }
-        console.log(`缓存成功`+ "cigen"+id);  
+        console.log(`缓存成功`+ "cigen"+id)  
       }
-      this.news = news;
+      this.news = news
       this.$apply()
     }
+
+     onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: this.news.title,
+        path: "/pages/news/news?id="+this.news.id
+      }
+    }
+
     onLoad(options) {
       this.getNews(options.id)
     }

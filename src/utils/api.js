@@ -13,7 +13,7 @@ const request = async (options, showLoading = true) => {
   }
   // 显示加载中
   if (showLoading) {
-    wepy.showLoading({title: '加载中'})
+    wepy.showLoading({title: '拼命加载中'})
   }
   // 拼接请求地址
   options.url = host + '/' + options.url
@@ -25,12 +25,15 @@ const request = async (options, showLoading = true) => {
     wepy.hideLoading()
   }
 
+console.log(response)
   // 服务器异常后给与提示
   if (response.statusCode === 500) {
+    /*
     wepy.showModal({
       title: '提示',
       content: '服务器错误，请联系管理员或重试'
     })
+    */
   }
   return response
 }
@@ -42,12 +45,15 @@ const login = async (params = {}) => {
 
   // 参数中增加code
   params.code = loginData.code
+  console.log(loginData)
 
   // 接口请求 weapp/authorizations
   let authResponse = await request({
     url: 'weapp/authorizations',
-    data: params,
-    method: 'POST'
+    method: 'POST',
+    data: {
+          code: loginData.code,
+    }
   })
 
   // 登录成功，记录 token 信息

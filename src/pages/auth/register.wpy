@@ -129,6 +129,7 @@
         return false
       }
       // 检查验证码是否过期
+      /*
       if (new Date().getTime() > this.verificationCode.expiredAt) {
         wepy.showToast({
           title: '验证码已过期',
@@ -138,7 +139,7 @@
         this.resetRegister()
         return false
       }
-
+  */
       try {
         let formData = e.detail.value
         formData.verification_key = this.verificationCode.key

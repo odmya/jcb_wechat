@@ -48,6 +48,7 @@ export default class extends wepy.app {
       'pages/words/jidanci',
       'pages/words/cigenlist',
       'pages/news/news',
+      'pages/words/wordbundle',
       'pages/user'
     ],
     window: {
@@ -68,21 +69,14 @@ export default class extends wepy.app {
         text: '背单词',
         iconPath: 'images/jdc.png',
         selectedIconPath: 'images/jdc1.png'
-      }
-      ,
-
+      },
       {
         pagePath: 'pages/words/cigenlist',
         text: '词根',
         iconPath: 'images/dictionary1.png',
         selectedIconPath: 'images/dictionary2.png'
       }
-      , {
-        pagePath: 'pages/user',
-        text: '我的',
-        iconPath: 'images/user1.png',
-        selectedIconPath: 'images/user2.png'
-      }],
+      ],
       color: '#707070',
       selectedColor: '#00b5ad'
     }

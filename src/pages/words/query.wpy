@@ -1,288 +1,304 @@
 
-<style>
-page{
-    background-color: #FFFFFF;
-}
+  <style>
+  page{
+      background-color: #FFFFFF;
+  }
 
-.avatar {
-  width: 17px;
-  height: 17px;
+  .avatar {
+    width: 17px;
+    height: 17px;
 
-}
-.page__hd{
-  padding: 5px 10px;
-  text-align: center;
-}
-.weui-article__section{
- padding: 5px;
-}
-.weui-article__section1{
-  padding-bottom: 2px;
-}
-.weui-article__p,.page__desc{
-  font-size:12px;
-  color:#888888;
+  }
+  .page__hd{
+    padding: 5px 10px;
+    text-align: center;
+  }
+  .weui-article__section{
+   padding: 5px;
+  }
+  .weui-article__section1{
+    padding-bottom: 2px;
+  }
+  .weui-article__p,.page__desc{
+    font-size:12px;
+    color:#888888;
 
-}
-.weui-flex__item{
-  text-align: left;
-  
-}
-.weui-article__h3{
-  font-size:15px;
-}
-.changezindex{
-  z-index: 1000;
-}
-.weui-media-link{
-  color:blue;
-  text-decoration: underline;
-  font-size: 14px;
-}
-.section_word{
-
-}
-</style>
-<template>
-  <searchbar></searchbar>
-    <view class="page word-top">
-        <view class="page__hd">
-            <view class="page__title">{{ words.word }}</view>
-            <view class="weui-flex">
-              <repeat for="{{ words.voice.data }}" key="id" index="index" item="voice">
-
-              <view class="weui-flex__item" data-path="{{voice.path}}" @tap="playmp3"> {{voice.symbol}}<image class="avatar"  src="../../images/sound.png" /> </view>
-              </repeat>
-            </view>
-        </view>
-        <view class="page__bd">
-            <view class="weui-article">
-                <view class="weui-article__section">
-                    <view class="weui-article__section1">
-
-                        <view class="weui-article__p">
-                          <repeat for="{{ words.explain.data.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
-                        </view>
-                    </view>
-                    <view class="weui-article__section1" wx:if="{{ words.tip.data.length }}">
-
-                       <view class="weui-panel__ft">
-                          <view class="weui-cell weui-cell_access weui-cell_link">
-                              <view class="weui-cell__bd" @tap="tip">记忆窍门</view>
-                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
-                          </view>
-                      
-
-                          <view wx:if="{{closetip}}">
-                            <repeat for="{{ words.tip.data }}" key="id" index="index" item="tip">
-                              <view class="weui-article__p">
-                                {{tip.tip}} 
-                              </view>
-
-                            </repeat>
-                            
-                          </view>
-                      </view>  
-                         
-                        
-                    </view>
-
-                    <view class="weui-article__section1" wx:if="{{ words.root.data.length }}">
-                       <view class="weui-panel__ft">
-                          <view class="weui-cell weui-cell_access weui-cell_link">
-                              <view class="weui-cell__bd" @tap="cigen">词根</view>
-                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
-                          </view>
-                          <view wx:if="{{closecigen}}">
-                            <repeat for="{{ words.root.data }}" key="id" index="index" item="root">
-                              <view class="weui-article__p">
-                                 <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-link" hover-class="weui-cell_active">
-                                   <view>{{root.root_alias?root.root_alias:root.root}} </view>
-                                 </navigator>
-
-                                
-                                <view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
-                              </view>
-
-                            </repeat>
-                            
-                          </view>
-                        </view>      
-                    </view>
-
-                    <view class="weui-article__section1" wx:if="{{ words.sentence.data.length }}">
-                      <view class="weui-panel__ft">
-                          <view class="weui-cell weui-cell_access weui-cell_link">
-                              <view class="weui-cell__bd" @tap="liju">例句</view>
-                              <view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
-                          </view>
-                           <view wx:if="{{closeliju}}">
-                            <repeat for="{{ words.sentence.data }}" key="id" index="index" item="liju">
-                              <view class="weui-article__p">
-                                 <view>{{liju.english}} </view>    
-                                 <view>  {{liju.chinese}} --{{liju.quote}} </view>                               
-                              </view>
-
-                            </repeat>
-                            
-                          </view>
-                      </view>    
-                    </view>
-
-
-                </view>
-            </view>
-        </view>
-
-    </view>
+  }
+  .weui-flex__item{
+    text-align: left;
     
-<menufoot></menufoot>
-</template>
+  }
+  .weui-article__h3{
+    font-size:15px;
+  }
+  .changezindex{
+    z-index: 1000;
+  }
+  .weui-media-link{
+    color:blue;
+    text-decoration: underline;
+    font-size: 14px;
+  }
+  .section_word{
 
-<script>
-  import wepy from 'wepy'
-  import api from '@/utils/api'
-  import Searchbar from '../../components/searchbar';
-  import Menufoot from '../../components/menu';
+  }
+  </style>
+  <template>
+    <searchbar></searchbar>
+      <view class="page word-top">
+          <view class="page__hd">
+              <view class="page__title">{{ words.word }} </view>
+              <view class="weui-flex">
+                <repeat for="{{ words.voice.data }}" key="id" index="index" item="voice">
 
-  export default class WordShow extends wepy.page {
+                <view class="weui-flex__item" data-path="{{voice.path}}" @tap="playmp3"> {{voice.symbol}}<image class="avatar"  src="../../images/sound.png" /> </view>
+                </repeat>
+              </view>
+              <view class="word_image" wx:if="{{ words.image.image }}"><image src="https://www.jciba.cn/uploads/images/words/{{ words.image.image }}" /> </view>
+          </view>
+          <view class="page__bd">
+              <view class="weui-article">
+                  <view class="weui-article__section">
+                      <view class="weui-article__section1">
+
+                          <view class="weui-article__p">
+                            <repeat for="{{ words.explain.data.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
+                          </view>
+                      </view>
+                      <view class="weui-article__section1" wx:if="{{ words.tip.data.length }}">
+
+                         <view class="weui-panel__ft">
+                            <view class="weui-cell weui-cell_access weui-cell_link">
+                                <view class="weui-cell__bd" @tap="tip">记忆窍门</view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                            </view>
+                        
+
+                            <view wx:if="{{closetip}}">
+                              <repeat for="{{ words.tip.data }}" key="id" index="index" item="tip">
+                                <view class="weui-article__p">
+                                  {{tip.tip}} 
+                                </view>
+
+                              </repeat>
+                              
+                            </view>
+                        </view>  
+                           
+                          
+                      </view>
+
+                      <view class="weui-article__section1" wx:if="{{ words.root.data.length }}">
+                         <view class="weui-panel__ft">
+                            <view class="weui-cell weui-cell_access weui-cell_link">
+                                <view class="weui-cell__bd" @tap="cigen">词根</view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+                            </view>
+                            <view wx:if="{{closecigen}}">
+                              <repeat for="{{ words.root.data }}" key="id" index="index" item="root">
+                                <view class="weui-article__p">
+                                   <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-link" hover-class="weui-cell_active">
+                                     <view>{{root.root_alias?root.root_alias:root.root}} </view>
+                                   </navigator>
+
+                                  
+                                  <view> <rich-text nodes="{{root.detail?root.detail:root.root_description}}"></rich-text>  </view>
+                                </view>
+
+                              </repeat>
+                              
+                            </view>
+                          </view>      
+                      </view>
+
+                      <view class="weui-article__section1" wx:if="{{ words.sentence.data.length }}">
+                        <view class="weui-panel__ft">
+                            <view class="weui-cell weui-cell_access weui-cell_link">
+                                <view class="weui-cell__bd" @tap="liju">例句</view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
+                            </view>
+                             <view wx:if="{{closeliju}}">
+                              <repeat for="{{ words.sentence.data }}" key="id" index="index" item="liju">
+                                <view class="weui-article__p">
+                                   <view>{{liju.english}} </view>    
+                                   <view>  {{liju.chinese}} --{{liju.quote}} </view>                               
+                                </view>
+
+                              </repeat>
+                              
+                            </view>
+                        </view>    
+                      </view>
+
+
+                  </view>
+              </view>
+          </view>
+
+          <view style="text-align:center">
+                <button class="weui-btn mini-btn" type="primary" style="margin-bottom: 80px" open-type="share" size="mini">分享给朋友</button>
+           </view>  
+
+      </view>
+      
+  <menufoot></menufoot>
+  </template>
+
+  <script>
+    import wepy from 'wepy'
+    import api from '@/utils/api'
+    import Searchbar from '../../components/searchbar'
+    import Menufoot from '../../components/menu'
+
+    export default class WordShow extends wepy.page {
     components = {
-            searchbar: Searchbar,
-            menufoot: Menufoot
-        }
+      searchbar: Searchbar,
+      menufoot: Menufoot
+    }
     config = {
       navigationBarTitleText: '记词吧',
     }
     data = {
-      // 话题数据
+        // 话题数据
       words: '',
       closetip: true,
-      closecigen:true,
-      closeliju:true,
-      innerAudioContext:''
-
+      closecigen: true,
+      closeliju: true,
+      innerAudioContext: ''
     }
 
 
     methods = {
+          tip(e){
+              if (this.closetip === false){
+                this.closetip =true
+              } else {
+                this.closetip =false
+              }
+          },
+          cigen(e){
+            if (this.closecigen === false){
+                this.closecigen = true
+              } else {
+                this.closecigen = false
+              }
 
-        tip(e){
-            if(this.closetip==false){
-              this.closetip =true;
-            }else{
-              this.closetip =false;
-            }
-        },
-        cigen(e){
-          if(this.closecigen==false){
-              this.closecigen =true;
-            }else{
-              this.closecigen =false;
-            }
+          },
+          liju(e){
+            if (this.closeliju === false){
+                this.closeliju = true
+              } else {
+                this.closeliju = false
+              }
 
-        },
-        liju(e){
-          if(this.closeliju==false){
-              this.closeliju =true;
-            }else{
-              this.closeliju =false;
-            }
+          },
 
-        },
+         playmp3(event){
+                  let path="https://www.jciba.cn/" + event.currentTarget.dataset.path
 
-       playmp3(event){
-                let path="https://www.jciba.cn/" + event.currentTarget.dataset.path;
-
-                this.innerAudioContext = wepy.createInnerAudioContext()
-                this.innerAudioContext.autoplay = true
-                this.innerAudioContext.obeyMuteSwitch = false 
-                this.innerAudioContext.src = path
-                this.innerAudioContext.onPlay(() => {
-                    console.log('开始播放')
-                })
-                 
-            }
-    }
-    // 获取单词数据
-    async getTopic(word) {
-      //let words = wepy.getStorageSync(word) 设置缓存
+                  this.innerAudioContext = wepy.createInnerAudioContext()
+                  this.innerAudioContext.autoplay = true
+                  this.innerAudioContext.obeyMuteSwitch = false 
+                  this.innerAudioContext.src = path
+                  this.innerAudioContext.onPlay(() => {
+                      console.log('开始播放')
+                  })
+                   
+              }
+      }
+      // 获取单词数据
+      async getTopic(word) {
+        //let words = wepy.getStorageSync(word) 设置缓存
+        
+        let words = ''
+        if (!words) {
+            try {
+            let wordResponse = await api.request({
+                              url: 'word',
+                              method: 'POST',
+                              data: {
       
-      let words = ''
-      if (!words) {
-          try {
-          let wordResponse = await api.request({
-                            url: 'word',
-                            method: 'POST',
-                            data: {
-    
-                              word: word,
-                              include:"explain, voice,tip,level,root,sentence"
-                            }
-                          })
-          words = wordResponse.data.data;
-            // Token 存在则说明已登录
-          
-          let accessToken = wepy.getStorageSync('access_token')
-          let userinfom = wepy.getStorageSync('userinfomini');
-          if (accessToken) {
-              if(userinfom==false){
+                                word: word,
+                                include:"explain, voice,tip,level,root,sentence"
+                              }
+                            })
+            words = wordResponse.data.data
+              // Token 存在则说明已登录
+            
+            let accessToken = wepy.getStorageSync('access_token')
+            let userinfom = wepy.getStorageSync('userinfomini')
+            if (accessToken) {
+                if(userinfom==false){
 
-                 let userResponse = await api.authRequest('user')
-                  this.userInfo = userResponse.data
-                  this.loggedIn = true
-                  //console.log(userResponse.data);
-                  wepy.setStorageSync('userinfomini',userResponse.data);
-                  this.$apply()
+                   let userResponse = await api.authRequest('user')
+                    this.userInfo = userResponse.data
+                    this.loggedIn = true
+                    //console.log(userResponse.data)
+                    wepy.setStorageSync('userinfomini',userResponse.data)
+                    this.$apply()
+
+                }
+                // 测试 authRequest 接口
+               
+              }else{
+                wepy.setStorageSync('userinfomini',"")
+                userinfom = ""
 
               }
-              // 测试 authRequest 接口
-             
-            }else{
-              wepy.setStorageSync('userinfomini',"");
-              userinfom = "";
+      
+            if(userinfom){
+              let searchcacheResponse = await api.request({
+                              url: 'wordsearchcache',
+                              method: 'POST',
+                                                data: {
+                        
+                                                  word_id: words.id,
+                                                  user_id: userinfom.id
+                                                }
+                           })
+              let searchresultcache = searchcacheResponse.data.data
+              wepy.setStorageSync('searchresultcache', searchresultcache)
+
+              //console.log("searchresultcache:"+searchresultcache)
 
             }
-    
-          if(userinfom){
-            let searchcacheResponse = await api.request({
-                            url: 'wordsearchcache',
-                            method: 'POST',
-                                              data: {
-                      
-                                                word_id: words.id,
-                                                user_id: userinfom.id
-                                              }
-                         })
-            let searchresultcache = searchcacheResponse.data.data;
-            wepy.setStorageSync('searchresultcache', searchresultcache)
+            /*
+            
+            */
+            //console.log(words) 
+          //  wepy.setStorageSync(word, words) 设置缓存
 
-            //console.log("searchresultcache:"+searchresultcache);
-
+            //this.words = words
+            //this.$apply()
+          } catch (err) {
+            //console.log(err)
+            wepy.showModal({
+              title: '提示',
+              content: '服务器错误，请稍后'
+            })
           }
-          /*
-          
-          */
-          //console.log(words); 
-        //  wepy.setStorageSync(word, words) 设置缓存
-
-          //this.words = words
-          //this.$apply()
-        } catch (err) {
-          //console.log(err)
-          wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请稍后'
-          })
+          //console.log(`缓存成功` + word)  
         }
-        //console.log(`缓存成功` + word);  
+   
+        this.words = words
+        this.$apply()
       }
- 
-      this.words = words
-      this.$apply()
+
+    onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: "怎么记住单词"+ this.words.word + "点击查看",
+        path: '/pages/words/query?word=' + this.words.word
+      }
     }
-    onLoad(options) {
-      this.getTopic(options.word)
-      
+
+
+      onLoad(options) {
+        this.getTopic(options.word)
+        
+      }
     }
-  }
-</script>
+  </script>

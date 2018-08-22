@@ -17,7 +17,7 @@
     right: 0;
     width: 100%;
   
-    height: 400rpx;
+    height: 200rpx;
 }
 .changezindexcss{
 
@@ -65,8 +65,8 @@
 </template>
 
 <script>
-    import wepy from 'wepy';
-    import api from '@/utils/api';
+    import wepy from 'wepy'
+    import api from '@/utils/api'
     export default class Searchbar extends wepy.page {
 
         data = {
@@ -75,9 +75,8 @@
             queryword:'',
             searchresult:[],
             changezindex:'currectzindexcss',
-            page: 1
-            
-        };
+            page: 1        
+        }
 
 
  watch = {
@@ -91,7 +90,7 @@
                 if (!searchresult) {
                         try {
 
-                        this.searchresult=[];
+                        this.searchresult=[]
                            // 请求话题列表接口
                             let wordResponse = await api.request({
                               url: 'wordsearch',
@@ -102,10 +101,10 @@
                                 include:"explain"
                               }
                             })
-                            searchresult = wordResponse.data.data;
+                            searchresult = wordResponse.data.data
                             wepy.setStorageSync('search'+newValue, searchresult)
                             // 将数据合并到 this.topics
-                            //this.searchresult = searchresult;
+                            //this.searchresult = searchresult
                             //this.$apply()
                             } catch (err) {
                               wepy.showModal({
@@ -113,19 +112,19 @@
                                 content: '服务器错误，请联系管理员'
                               })
                             }
-                  console.log(`缓存成功`+ 'search' + newValue);            
+                  console.log(`缓存成功`+ 'search' + newValue)            
                 }
                 this.searchresult = searchresult
                 this.$apply()
-                //console.log(`num value: ${oldValue} -> ${newValue}`);
+                //console.log(`num value: ${oldValue} -> ${newValue}`)
 
             }else{
-                this.searchresult=[];
+                this.searchresult=[]
   
-               // this.changezindex ='currectzindexcss';
+               // this.changezindex ='currectzindexcss'
             }
             
-           // console.log("test" + this.changezindex);
+           // console.log("test" + this.changezindex)
           
       }
   }
@@ -135,11 +134,11 @@
         methods = {
 
             async searchword(){
-                this.inputShowed = true;
+                this.inputShowed = true
 
                 try {
 
-                    this.searchresult=[];
+                    this.searchresult=[]
                        // 请求话题列表接口
                         let wordResponse = await api.request({
                           url: 'wordsearch',
@@ -150,9 +149,9 @@
                             include:"explain"
                           }
                         })
-                        let searchresult = wordResponse.data.data;
+                        let searchresult = wordResponse.data.data
                         // 将数据合并到 this.topics
-                        this.searchresult = searchresult;
+                        this.searchresult = searchresult
                         this.$apply()
                 } catch (err) {
                   wepy.showModal({
@@ -164,32 +163,32 @@
             },
            
             showInput () {
-                this.inputShowed = true;
-                let searchresult = wepy.getStorageSync('searchresultcache');
-                    this.searchresult = searchresult;
+                this.inputShowed = true
+                let searchresult = wepy.getStorageSync('searchresultcache')
+                    this.searchresult = searchresult
                     this.$apply()
             },
             hideInput () {
-                this.inputVal = '';
-                this.inputShowed = false;
-                this.searchresult=[];
+                this.inputVal = ''
+                this.inputShowed = false
+                this.searchresult=[]
             },
             clearInput () {
-                this.inputVal = '';
-                //this.inputShowed = false;
-                this.searchresult=[];
+                this.inputVal = ''
+                //this.inputShowed = false
+                this.searchresult=[]
             },
 
            inputTyping (e) {
-                this.inputShowed = true;
-                this.queryword = e.detail.value;
-                this.inputVal = e.detail.value;
+                this.inputShowed = true
+                this.queryword = e.detail.value
+                this.inputVal = e.detail.value
 
                  if(this.inputVal==""){
-                    let searchresult = wepy.getStorageSync('searchresultcache');
-                    this.searchresult = searchresult;
-                    console.log(searchresult);
-                    console.log("test2");
+                    let searchresult = wepy.getStorageSync('searchresultcache')
+                    this.searchresult = searchresult
+                    console.log(searchresult)
+                    console.log("test2")
                     this.$apply()
 
                 }

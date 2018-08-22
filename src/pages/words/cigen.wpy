@@ -13,6 +13,7 @@ image{
 .page__hd{
   padding: 5px 10px;
   text-align: center;
+
 }
 .weui-article__section{
  padding: 5px;
@@ -29,6 +30,7 @@ image{
 }
 .weui-article__p,.page__desc{
   font-size:12px;
+
 }
 .cigen_article{
   text-align: left;
@@ -43,7 +45,9 @@ image{
 <template>
   <searchbar></searchbar>
     <view class="page top-margin">
-      <view class="page__title">{{ cigen.name }}</view>
+      <view class="page__title">{{ cigen.name }} 
+
+      </view>
       <view class="page__desc">
             <rich-text nodes="{{cigen.description}}"></rich-text> 
       </view>
@@ -60,7 +64,7 @@ image{
                                 <navigator url="/pages/words/query?word={{ word.word }}" hover-class="weui-cell_active">
                                   <view class="weui-media-link">{{word.word}} {{word.pivot.explain?word.pivot.explain:""}}</view>  
                                  </navigator>
-                                <view>{{word.pivot.detail}}</view>  
+                                <view >{{word.pivot.detail?word.pivot.detail:""}}</view>  
                               </view>
 
                             </repeat>
@@ -71,7 +75,12 @@ image{
                   </repeat>   
                 </view> 
             </view> 
-      </view>               
+           <view style="text-align:center">
+                <button class="weui-btn mini-btn" type="primary" style="margin-bottom: 80px" open-type="share" size="mini">分享给朋友</button>
+           </view>   
+      </view>    
+
+               
     </view>
     <menufoot></menufoot>
 </template>
@@ -79,8 +88,8 @@ image{
 <script>
   import wepy from 'wepy'
   import api from '@/utils/api'
-  import Searchbar from '../../components/searchbar2';
-  import Menufoot from '../../components/menu';
+  import Searchbar from '../../components/searchbar2'
+  import Menufoot from '../../components/menu'
   export default class CigenShow extends wepy.page {
     components = {
             searchbar: Searchbar,
@@ -111,7 +120,7 @@ image{
               include: 'cixing'
             }
           })
-          cigen = rootResponse.data.data;
+          cigen = rootResponse.data.data
           //wepy.setStorageSync("cigen"+id, cigen) 设置缓存
 
           //this.cigen = cigen
@@ -123,11 +132,23 @@ image{
             content: '服务器错误，请联系管理员'
           })
         }
-        console.log(`缓存成功`+ "cigen"+id);  
+        console.log(`缓存成功`+ "cigen"+id)  
       }
       this.cigen = cigen
       this.$apply()
     }
+
+    onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: "词根" + this.cigen.name,
+        path: 'pages/words/cigenlist'
+      }
+    }
+
     onLoad(options) {
       this.getWords(options.id)
     }
