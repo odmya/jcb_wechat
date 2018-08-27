@@ -49,6 +49,9 @@ export default class extends wepy.app {
       'pages/words/cigenlist',
       'pages/news/news',
       'pages/words/wordbundle',
+      'pages/words/newwordtoday',
+      'pages/words/reviewwordtoday',
+      'pages/words/rememberword',
       'pages/user'
     ],
     window: {
@@ -57,6 +60,7 @@ export default class extends wepy.app {
       navigationBarTitleText: '记词吧',
       navigationBarTextStyle: 'black'
     },
+    
     tabBar: {
       list: [{
         pagePath: 'pages/index',

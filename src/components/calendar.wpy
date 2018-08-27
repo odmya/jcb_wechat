@@ -90,7 +90,7 @@
         this.now.day = newDate.getDate()
         
 
-        
+        console.log('测试日历:' + this.now.year + this.now.month)
 
         this.calculateEmptyGrids(this.now.year, this.now.month)
         this.$apply() 
@@ -267,8 +267,13 @@
       }
 
       setCurrentData() { // 设置当前年月
-        this.current.year = new Date(this.currentDate).getFullYear()
-        this.current.month = new Date(this.currentDate).getMonth() + 1
+
+        this.current.year = new Date().getFullYear()
+        this.current.month = new Date().getMonth() + 1
+
+        let newDate = new Date()
+
+        console.log('设置当前年test' + newDate.getFullYear() )
       }
     }
 </script>

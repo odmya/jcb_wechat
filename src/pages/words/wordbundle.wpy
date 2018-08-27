@@ -1,72 +1,139 @@
-<style lang="less">
-.login-wrap {
-  margin-top: 50px;
+
+  <style>
+  page{
+      background-color: #FFFFFF;
+  }
+
+  .avatar {
+    width: 17px;
+    height: 17px;
+
+  }
+  .page__hd{
+    padding: 5px 10px;
+
+  }
+  .weui-article__section{
+   padding: 5px;
+  }
+  .weui-article__section1{
+    padding-bottom: 2px;
+  }
+  .weui-article__p,.page__desc{
+    font-size:12px;
+
+  }
+  .weui-flex__item{
+    text-align: left;
+    
+  }
+  .weui-article__h3{
+    font-size:15px;
+  }
+  .changezindex{
+    z-index: 1000;
+  }
+  .weui-media-link{
+    font-size: 12px;
+  }
+  .wordlist{
+font-size: 11px;
+margin-bottom: 58px;
+  }
+.weui-cell__ft{
+  padding-left: 15px;
 }
-.tips{
-  text-align: left;
-  font-size:11px;
+.page__title{
+  font-size: 12px;
 }
-</style>
+  .weui-cell{
+    padding-left: 5px;
+  }
+  .wordlist .weui-cell__bd, .wordlist .weui-cell__ft{
+
+font-size: 11px;
+
+text-align: left;
+    
+  }
+  </style>
+
 <template>
+<searchbar></searchbar>
 
-  <view wx:if="{{setbundle}}">
+<view class="page word-top wordlist">
+          <view class="page__hd">
+        <view wx:if="{{setbundle}}">
 
-  <view class="weui-article__p">
-    <picker @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
-      <button type="default">选择生词本</button>
-    </picker>
-  </view>
+          <view class="weui-article__p">
+            <picker @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
+              <button type="default">选择生词本</button>
+            </picker>
+          </view>
 
-</view>
-<view wx:else>
-                    <view>
+        </view>
+        <view wx:else>
+                            <view>
 
-                        <view class="weui-cells__title">设置</view>
-                        
-                        <view class="weui-cells weui-cells_after-title">
+                                <view class="weui-cells__title">设置</view>
+                                
+                                <view class="weui-cells weui-cells_after-title">
 
-                          <view class="weui-cells__title">
+                                  <view class="weui-cells__title" style="font-size:15px;color:blue;padding:5px 0px;text-align:center">
 
-                            <picker class="wepy-calendar-date" @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
-                              {{wordbundle.level_base}}
-                              
-                              </picker>
+                                    <picker class="wepy-calendar-date" @change="bindPickerChange" value="{{index}}" range="{{bundles}}">
+                                      点击切换生词本, 当前: {{wordbundle.level_base}}
+                                      
+                                      </picker>
 
-                          </view>
-                          <view class="weui-cell weui-cell_input">
-                            <view class="weui-cell__hd">
-                              <view class="weui-label">每天单词</view>
+                                  </view>
+                                  <view class="weui-cell weui-cell_input">
+                                    <view class="weui-cell__hd">
+                                      <view class="weui-label">每天单词</view>
+                                    </view>
+                                    <view class="weui-cell__bd">
+                                      <input class="weui-input" value="{{maxsize}}" placeholder="请输入单词数" @input="inputTyping"/>
+                                    </view>
+                                  </view>
+
+                                  <view class="weui-btn-area">
+                                      <view class="tips" style="font-size:12px;">
+                                        温馨提示: 学生建议每天1-3个新单词，每个新单词默认需要复习7次，历时十五天。 以每天三个单词为例，十五天后需要每天复习3*15 = 45个单词，贵在坚持！复习比学习新单词更重要。
+                                      </view>
+                                  </view>
+
+                                  <view class="weui-btn-area">
+                                    <button class="weui-btn" type="primary" @tap="updatebundle">确定</button>
+                                  </view>
+          
+
+                                </view>
                             </view>
-                            <view class="weui-cell__bd">
-                              <input class="weui-input" value="{{maxsize}}" placeholder="请输入单词数" @input="inputTyping"/>
-                            </view>
-                          </view>
+        </view>
+          </view>
+          
 
-                          <view class="weui-btn-area">
-                              <view class="tips">
-                                温馨提示: 小学生建议每天1-3个新单词，每个新单词默认需要复习7次，历时十五天。 如每天三个单词，十五天后每天需要每天复习3*15=45个单词，贵在坚持！复习比学习新单词更重要。
-                              </view>
-                          </view>
 
-                          <view class="weui-btn-area">
-                            <button class="weui-btn" type="primary" @tap="updatebundle">确定</button>
-                          </view>
+      </view>
+
   
-
-                        </view>
-                    </view>
-</view>
                    
-
+ <menufoot></menufoot>
 </template>
 
 <script>
   import wepy from 'wepy'
   import api from '@/utils/api'
-
+    import Searchbar from '../../components/searchbar'
+    import Menufoot from '../../components/menu'
   export default class Login extends wepy.page {
     config = {
       navigationBarTitleText: '登录'
+    }
+
+components = {
+      searchbar: Searchbar,
+      menufoot: Menufoot
     }
     data = {
       // 用户名

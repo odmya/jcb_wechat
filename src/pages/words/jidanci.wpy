@@ -4,36 +4,53 @@ page{
 	background-color: #FFFFFF;
 }
 
-.avatar {
-	width: 17px;
-	height: 17px;
+  .avatar {
+    width: 17px;
+    height: 17px;
 
-}
-.page__hd{
-	padding: 5px 10px;
-	text-align: center;
-}
-.weui-article__section{
-	padding: 5px;
-}
-.weui-article__section1{
-	padding-bottom: 2px;
-}
-.weui-article__p,.page__desc{
-	font-size:12px;
-	color:#888888;
+  }
+  .page__hd{
+    padding: 5px 10px;
+    text-align: center;
+  }
+  .weui-article__section{
+   padding: 5px;
+  }
+  .weui-article__section1{
+    padding-bottom: 2px;
+  }
+  .weui-article__p,.page__desc{
+    font-size:12px;
+    color:#888888;
 
-}
+  }
+  .weui-article__p > .weui-flex__item{
+    text-align: left;
+    float:left;
+  }
+  .weui-article__h3{
+    font-size:15px;
+  }
+  .changezindex{
+    z-index: 1000;
+  }
+  .weui-media-link{
+    color:blue;
+    text-decoration: underline;
+    font-size: 14px;
+  }
 
 .weui-article__infomation{
 	font-size:12px;
 	color:#888888;
 	align-content: left;
 
+
 }
 
-.weui-flex__item{
+.weui-flex .weui-flex__item{
 	text-align: left;
+	float:left;
 
 }
 .weui-article__h3{
@@ -47,12 +64,18 @@ page{
 	font-size: 14px;
 }
 .wordwaning{
-	color:blue;
-	size: 10px;
+	clear: both;
+	font-size: 9px;
 	text-align: left;
 }
 .section_word{
 
+}
+
+.displayexplain{
+
+font-size: 9px;
+	text-align: center;
 }
 
 .top-margin{
@@ -63,6 +86,7 @@ page{
 	text-align: left;
 	font-size:12px;
 	padding:0px 5px;
+	clear:both;
 }
 .roottext{
 	overflow:hidden; 
@@ -77,14 +101,23 @@ page{
 	text-align: left;
 	font-size:10px;
 }
-.correct_answer{
-
+.viewtitle{
+	float:left;
+}
+.neverview{
+	margin: 5px;
+	float:right;
+}
+.showfinish{
+	text-align: left;
+	font-size:11px;
 }
 .navbar .weui-tab__content{padding-top:5px;}
 
 </style>
 <template>
-	<view class="page weui-article__infomation" animation="{{animationData}}">
+	<searchbar></searchbar>
+	<view class="page word-top" animation="{{animationData}}">
 		<view wx:if="{{ loggedIn }}">
 			<view wx:if="{{ShowNewWord}}">
 				<view class="weui-progress">
@@ -93,9 +126,22 @@ page{
 	                </view>
 
             	</view>
-				<view class="page__hd">
-					<view class="page__title">{{ currentdata.word }}</view>
-					<view><button class="weui-btn mini-btn" type="default" size="mini" @tap="dancizhan" data-path="{{currentdata.word_id}}" size="mini">认识不再出现</button></view>
+				<view class="page__hd weui-article">
+
+					<view class="page__title">
+					
+						<view class="viewtitle">
+							{{ currentdata.word }}
+						</view>
+						<view class="neverview">
+							<button class="weui-btn mini-btn" type="default" size="mini" @tap="dancizhan" data-path="{{currentdata.word_id}}" size="mini">斩</button>
+
+						</view>
+
+						<view class="wordwaning"></view>
+
+					</view>
+
 					<view class="weui-flex">
 						<repeat for="{{ currentdata.voice }}" key="id" index="index" item="voice">
 
@@ -103,10 +149,12 @@ page{
 						</repeat>
 					</view>
 
-					<view class="weui-article__section" wx:if="{{ currentdata.image.image }}"><image src="https://www.jciba.cn/uploads/images/words/{{ currentdata.image.image }}" /> </view>
+					<view class="weui-article__section" wx:if="{{ currentdata.image.image }}">
+						<image src="https://www.jciba.cn/uploads/images/words/{{ currentdata.image.image }}" /> 
+					</view>
 
 					<view class="weui-article__section">
-						<view class="weui-article__section1">
+						<view class="weui-article__p">
 							<repeat for="{{ currentdata.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
 						</view>
 
@@ -149,7 +197,7 @@ page{
 											</navigator>
 
 
-											<view> <rich-text nodes="{{root.detail?root.detail:root.root_description}}"></rich-text>  </view>
+											<view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
 										</view>
 
 									</repeat>
@@ -195,12 +243,25 @@ page{
      
             	</view>
 
-				<view class="page__title">复习{{ reviewitem.word }}</view>
-				<view class="wordwaning"><icon type="info_circle" size="23"></icon> {{  reviewitem.word_review.next_time?reviewitem.word_review.next_time:"一小时后需要及时复习" }}
-				<view><button class="weui-btn mini-btn" type="default" size="mini" @tap="dancizhan" data-path="{{reviewitem.word_id}}" size="mini">不再复习</button></view>
-				</view>
+				<view class="page__title">
 				
+					<view class="viewtitle">
+						{{ reviewitem.word }}
+					</view>
+					<view class="neverview">
+						<button class="weui-btn mini-btn" type="default" size="mini" @tap="dancizhan" data-path="{{reviewitem.word_id}}" size="mini">斩</button>
+
+					</view>
+
+					<view class="wordwaning"> {{  reviewitem.word_review.next_time?reviewitem.word_review.next_time:"一小时后需要及时复习" }}</view>
+
+				</view>
+
+					
+
 				<view>
+				
+
 					<view class="weui-article__p">
 						<repeat for="{{ reviewitem.voice }}" key="id" index="index" item="voice">
 
@@ -230,89 +291,89 @@ page{
 					
 
 					<view class="weui-article__p" wx:if="{{ShowExplain}}">
-						<view wx:if="{{answertrue}}">
-							<icon type="info_circle" size="23" size="23"></icon>回答正确
-						</view>
-						<view wx:else class="wordwaning">
-							<icon type="warn" size="23" color="#F43530"></icon>回答错误
-						</view>
+						
 
-						<view style="text-align:center">
-							
-							<form bindsubmit="nextreview" report-submit='true' >
-							  <button form-type="submit" type="warn" size="mini">下一个单词</button>
-							</form>
+            		<view class="weui-cells weui-cells_after-title">
+		                <view class="weui-cell">
+		                    <view class="weui-cell__bd" bindtap="nextreview" style="color:blue">复习下一个单词</view>
+		                    <view class="weui-cell__ft" bindtap="displayexplain" style="font-size:9px">显示中文详情</view>
+		                </view>
+		            </view>
 
-						</view>
-						<view wx:if="{{ reviewitem.image.image }}"><image src="https://www.jciba.cn/uploads/images/words/{{ reviewitem.image.image }}" /> </view>
-						<view>
-							<repeat for="{{ reviewitem.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
-						</view>
-						<view class="weui-article__section1" wx:if="{{ reviewitem.tips.length }}">
-
-							<view class="weui-panel__ft">
-								<view class="weui-cell weui-cell_access weui-cell_link">
-									<view class="weui-cell__bd" @tap="tip">记忆窍门</view>
-									<view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
+						<view class="showexplandetail" wx:if="{{showexplandetail}}">
+								<view wx:if="{{ reviewitem.image.image }}">
+									<image src="https://www.jciba.cn/uploads/images/words/{{ reviewitem.image.image }}" /> 
 								</view>
+								<view>
+									<repeat for="{{ reviewitem.explain }}" key="id" index="index" item="explain">{{index}}: {{explain}}  </repeat>
+								</view>
+								<view class="weui-article__section1" wx:if="{{ reviewitem.tips.length }}">
 
-
-								<view wx:if="{{closetip}}">
-									<repeat for="{{ reviewitem.tips }}" key="id" index="index" item="tip">
-										<view class="weui-article__p">
-											{{tip.tip}} 
+									<view class="weui-panel__ft">
+										<view class="weui-cell weui-cell_access weui-cell_link">
+											<view class="weui-cell__bd" @tap="tip">记忆窍门</view>
+											<view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
 										</view>
 
-									</repeat>
 
-								</view>
-							</view>  
+										<view wx:if="{{closetip}}">
+											<repeat for="{{ reviewitem.tips }}" key="id" index="index" item="tip">
+												<view class="weui-article__p">
+													{{tip.tip}} 
+												</view>
 
+											</repeat>
 
-						</view>
-
-						<view class="weui-article__section1" wx:if="{{ reviewitem.root.length }}">
-							<view class="weui-panel__ft">
-								<view class="weui-cell weui-cell_access weui-cell_link">
-									<view class="weui-cell__bd" @tap="cigen">词根</view>
-									<view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
-								</view>
-								<view wx:if="{{closecigen}}">
-									<repeat for="{{ reviewitem.root }}" key="id" index="index" item="root">
-										<view class="weui-article__p">
-											<navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-media-link" hover-class="weui-cell_active">
-												<view>{{root.root_alias?root.root_alias:root.root.name}} </view>
-											</navigator>
-
-
-											<view> <rich-text nodes="{{root.detail?root.detail:root.root_description}}"></rich-text>  </view>
 										</view>
+									</view>  
 
-									</repeat>
 
 								</view>
-							</view>      
-						</view>
 
-						<view class="weui-article__section1" wx:if="{{ reviewitem.sentences.length }}">
-							<view class="weui-panel__ft">
-								<view class="weui-cell weui-cell_access weui-cell_link">
-									<view class="weui-cell__bd" @tap="liju">例句</view>
-									<view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
-								</view>
-								<view wx:if="{{closeliju}}">
-									<repeat for="{{ reviewitem.sentences }}" key="id" index="index" item="liju">
-										<view class="weui-article__p">
-											<view>{{liju.english}} </view>    
-											<view>  {{liju.chinese}} --{{liju.quote}} </view>                               
+								<view class="weui-article__section1" wx:if="{{ reviewitem.root.length }}">
+									<view class="weui-panel__ft">
+										<view class="weui-cell weui-cell_access weui-cell_link">
+											<view class="weui-cell__bd" @tap="cigen">词根</view>
+											<view class="weui-cell__ft weui-cell__ft_in-access" @tap="tip"></view>
 										</view>
+										<view wx:if="{{closecigen}}">
+											<repeat for="{{ reviewitem.root }}" key="id" index="index" item="root">
+												<view class="weui-article__p">
+													<navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-media-link" hover-class="weui-cell_active">
+														<view>{{root.root_alias?root.root_alias:root.root.name}} </view>
+													</navigator>
 
-									</repeat>
 
+													<view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
+												</view>
+
+											</repeat>
+
+										</view>
+									</view>      
 								</view>
-							</view>    
-						</view>
 
+								<view class="weui-article__section1" wx:if="{{ reviewitem.sentences.length }}">
+									<view class="weui-panel__ft">
+										<view class="weui-cell weui-cell_access weui-cell_link">
+											<view class="weui-cell__bd" @tap="liju">例句</view>
+											<view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
+										</view>
+										<view wx:if="{{closeliju}}">
+											<repeat for="{{ reviewitem.sentences }}" key="id" index="index" item="liju">
+												<view class="weui-article__p">
+													<view>{{liju.english}} </view>    
+													<view>  {{liju.chinese}} --{{liju.quote}} </view>                               
+												</view>
+
+											</repeat>
+
+										</view>
+									</view>    
+								</view>
+
+						</view>
+						
 						
 
 					</view>
@@ -322,26 +383,30 @@ page{
 
 
 
-			<view wx:if="{{ShowNewWord==false&&ShowReview==false}}">
+			<view wx:if="{{ShowNewWord==false&&ShowReview==false}}" style="showfinish">
 				<wepyCanlendar
 				:currentDate.sync="currentDate"
 				:hasIconList.sync="hasIconList"
 				></wepyCanlendar>
 
-				<view class="weui-cells__title">每天打卡</view>
+				<view class="weui-cells__title" bindtap="reloadapp">每天打卡</view>
 	            <view class="weui-cells weui-cells_after-title">
 	                <navigator url="/pages/words/wordbundle" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
 	                    <view class="weui-cell__bd "><view class="level_base_title">{{wordbundle.level_base}}</view><view class="level_base_sub">当前词库学习进度 {{wordbundle.rememberwords}}/{{wordbundle.wordcounts}}</view></view>
-	                    <view class="weui-cell__ft weui-cell__ft_in-access">
+	                    <view class="weui-cell__ft weui-cell__ft_in-access" style='font-size:10px'>
 	                    	切换单词本
 						</view>
 	                </navigator>
-	                <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                <navigator url="/pages/words/newwordtoday" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
 	                    <view class="weui-cell__bd level_base_title">今日新单词</view>
 	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
 	                </navigator>
-	                <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                <navigator url="/pages/words/reviewwordtoday" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
 	                    <view class="weui-cell__bd level_base_title">今日需要复习单词</view>
+	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
+	                </navigator>
+	                <navigator url="/pages/words/rememberword" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                    <view class="weui-cell__bd level_base_title">已经掌握单词</view>
 	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
 	                </navigator>
 	            </view>
@@ -365,6 +430,7 @@ page{
 <script>
 import wepy from 'wepy'
 import api from '@/utils/api'
+import Searchbar from '../../components/searchbar'
 import wepyCanlendar from '../../components/calendar'
 	  //import util from '@/utils/util'
 
@@ -373,7 +439,8 @@ import wepyCanlendar from '../../components/calendar'
 	  export default class JiDanCi extends wepy.page {
 
 	    components = {
-	            wepyCanlendar
+	            wepyCanlendar, 
+	            searchbar: Searchbar,
 	        }
 
 	  	config = {
@@ -381,11 +448,13 @@ import wepyCanlendar from '../../components/calendar'
 	  		enablePullDownRefresh: true
 	  	}
 
+
 	  	data = {
 	  	  hasIconList:[],
 	      // 话题数据
 	      words: '',
 	      choose: false,
+	      showexplandetail: false,
 	      currentidx: '',
 	      wordsTwo: [],
 	      wordpercent: 0,
@@ -433,27 +502,6 @@ import wepyCanlendar from '../../components/calendar'
 
 
 	  }
-
-	  async onPullDownRefresh() {
-        this.userinfomation = wepy.getStorageSync('userinfomini')
-        let wordfinishlistResponse = await api.request({
-        url: 'wordfinishlist',
-        method: 'POST',
-        data: {
-            user_id: this.userinfomation.id
-
-        }
-        })
-
-        if(wordfinishlistResponse.data.data){
-        let tmphasIconList = wordfinishlistResponse.data.data.date
-        this.hasIconList = tmphasIconList
-        this.$apply() 
-
-        }
-
-          wepy.stopPullDownRefresh()
-        }
 
 	      methods = {
 	      	tabClick (e) {
@@ -613,11 +661,30 @@ import wepyCanlendar from '../../components/calendar'
 	          	}
 
 	          },
+
+	          displayexplain(e){
+	          	 if(this.showexplandetail){
+	          	 	this.showexplandetail =false
+	          	 }else{
+	          	 	this.showexplandetail =true
+	          	 }
+	          },
+	          async reloadapp(e){
+		        await this.getTopic()
+				await this.getRoots(1,true)
+
+		        this.$apply() 
+	          },
+
 	          async radioChange(e) {
 	         	
 
 	          	if(e.detail.value ==this.reviewitem.word_id){
 	          		console.log('回答正常')
+	          		wepy.showToast({
+			            title: '回答正常',
+			            icon: 'success'
+			          })
 	          		this.explain_answer.forEach(function (v) {
 		          		if(v.id == e.detail.value){
 		          			v.checked = true
@@ -647,6 +714,11 @@ import wepyCanlendar from '../../components/calendar'
 			    	this.explain_answer.forEach(function (v) {
 		          		v.checked = false
 	                    
+	                    wepy.showToast({
+			            title: '回答错误！',
+			           	 icon: 'none',
+			          	})
+
 		          		console.log('回答错误')
 	                    console.log("测试单选值 v.id" + v.checked)
 
@@ -697,6 +769,7 @@ import wepyCanlendar from '../../components/calendar'
 
 			async nextreview(e){
 				console.log('记录formId 开始');
+				this.showexplandetail =false
 		    	if(this.formid===''){
 		    		this.formid = e.detail.formId;
 		    		let formidResponse = await api.request({
@@ -912,8 +985,8 @@ import wepyCanlendar from '../../components/calendar'
 	          }
 
 
-	          if(this.wordbundle ===''){
-		          	 let wordsetttingResponse = await api.request({
+
+		         let wordsetttingResponse = await api.request({
 		          	url: 'wordsetting',
 		          	data: {
 		          		user_id: this.userinfomation.id
@@ -944,7 +1017,7 @@ import wepyCanlendar from '../../components/calendar'
 		          this.valuelist = valuelist
 		          
 
-	          }
+	          
 	         
 	          
 	          this.$apply()
@@ -1210,6 +1283,7 @@ import wepyCanlendar from '../../components/calendar'
 
 
 	  async onShow(options) {
+
 			//this.$invoke('getRoots')
 			await this.getTopic()
 			await this.getRoots(1,true)
@@ -1243,6 +1317,7 @@ import wepyCanlendar from '../../components/calendar'
 	
 
 		async onLoad(options) {
+			console.log('我是onLoad')
 			let res = await wepy.getSystemInfo()
 			this.wordpercent = 0
 			this.wordpercentcount = 0
@@ -1265,7 +1340,16 @@ import wepyCanlendar from '../../components/calendar'
 				        wepy.setStorageSync('userinfomini',userResponse.data)
 				        this.$apply()
 				    }
-				}
+				}else{
+				    	let authResponse = await api.login()
+				    	let userResponse = await api.authRequest('user')
+				        this.userinfomation = userResponse.data
+				        this.loggedIn = true
+				        console.log('直接登录...不需要点击登录')
+				        console.log(userResponse.data)
+				        wepy.setStorageSync('userinfomini',userResponse.data)
+				        this.$apply()
+				    }
 
 			}catch(err){
 

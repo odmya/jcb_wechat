@@ -1,7 +1,7 @@
 import wepy from 'wepy'
 
 // 服务器接口地址
-const host = 'http://www.sbguh.com/api'
+const host = 'https://www.jciba.cn/api'
 
 // 普通请求
 const request = async (options, showLoading = true) => {
@@ -25,7 +25,7 @@ const request = async (options, showLoading = true) => {
     wepy.hideLoading()
   }
 
-console.log(response)
+//console.log(response)
   // 服务器异常后给与提示
   if (response.statusCode === 500) {
     /*
