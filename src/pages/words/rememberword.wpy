@@ -11,6 +11,7 @@
   }
   .page__hd{
     padding: 5px 10px;
+    text-align: center;
 
   }
   .weui-article__section{

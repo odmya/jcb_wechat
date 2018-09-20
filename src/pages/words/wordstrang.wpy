@@ -62,9 +62,9 @@ text-align: left;
     <searchbar></searchbar>
       <view class="page word-top wordlist">
           <view class="page__hd">
-              <view class="page__title">今日新单词!</view>
-              <view wx:if="{{wordrisklist.length}}" >
-                      <repeat for="{{ wordrisklist }}" key="id" index="index" item="wordrisk">
+              <view class="page__title">我的生词本(优先背诵)!</view>
+              <view wx:if="{{wordreviewlist.length}}" >
+                      <repeat for="{{ wordreviewlist }}" key="id" index="index" item="wordrisk">
 
                          <view class="weui-cells weui-cells_after-title">
                             <navigator url="/pages/words/query?word={{ wordrisk.word }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
@@ -94,7 +94,7 @@ text-align: left;
     import Menufoot from '../../components/menu'
   export default class Login extends wepy.page {
     config = {
-      navigationBarTitleText: '今日新单词'
+      navigationBarTitleText: '我的生词本'
     }
 
 components = {
@@ -109,7 +109,7 @@ components = {
       userinfomation:'',
       page: 1,
       noMoreData: false,
-      wordrisklist:'',
+      wordreviewlist:'',
 
     }
 
@@ -129,24 +129,19 @@ components = {
 
 
 async getRoots(page = 1, reset = false){
-
-          //新单词例表
         this.userinfomation = wepy.getStorageSync('userinfomini')
-        let wordrisklistResponse = await api.request({
-          url: 'wordrisklist',
-          data: {
-            user_id: this.userinfomation.id,
-            page: page
-          }
-        })
-
-        let wordrisklist = wordrisklistResponse.data.data
-        if(wordrisklist.length){
-          this.wordrisklist = reset ? wordrisklist : this.wordrisklist.concat(wordrisklist)
-          this.$apply()
+        let wordreviewlistResponse = await api.request({
+        url: 'wordstrangelist',
+        data: {
+          user_id: this.userinfomation.id,
+          page: page
         }
-
-        let pagination = wordrisklistResponse.data.meta.pagination
+      })
+      let wordreviewlist = wordreviewlistResponse.data.data
+      console.log("今日复习单词"+wordreviewlist)
+      this.wordreviewlist = reset ? wordreviewlist : this.wordreviewlist.concat(wordreviewlist)
+      this.$apply()
+      let pagination = wordreviewlistResponse.data.meta.pagination
 
             //console.log(wordreviewlistResponse)
             // 根据分页设置是否还有更多数据
@@ -154,10 +149,8 @@ async getRoots(page = 1, reset = false){
               //console.log("test2")
               this.noMoreData = true
             }
+
           this.$apply()
-
-
-
         }
 
  async onLoad (options) {

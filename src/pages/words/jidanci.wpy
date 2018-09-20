@@ -9,6 +9,25 @@ page{
     height: 17px;
 
   }
+
+  .avataricon {
+    width: 20px;
+    height: 20px;
+
+  }
+  .floatleft{
+  	float:left;
+  }
+  .custom_title{
+  	font-size: 12px;
+  	padding-top:3px;
+  	padding-left:2px;
+  	color: #00b5ad;
+  }
+
+.learnagain .custom_title{
+	text-align: center;
+}
   .page__hd{
     padding: 5px 10px;
     text-align: center;
@@ -100,6 +119,7 @@ font-size: 9px;
 .level_base_sub{
 	text-align: left;
 	font-size:10px;
+	color:#707070;
 }
 .viewtitle{
 	float:left;
@@ -111,6 +131,21 @@ font-size: 9px;
 .showfinish{
 	text-align: left;
 	font-size:11px;
+}
+.display_root{
+	text-align: left;
+	font-size:10px;
+}
+.display_root .weui-cell{
+	padding:5px 0px;
+}
+.learnagain{
+	text-align: center;
+	font-size: 12px;
+	color:green;
+}
+.learnagain .weui-flex__item{
+	text-align: center;
 }
 .navbar .weui-tab__content{padding-top:5px;}
 
@@ -191,14 +226,28 @@ font-size: 9px;
 								</view>
 								<view wx:if="{{closecigen}}">
 									<repeat for="{{ currentdata.root }}" key="id" index="index" item="root">
-										<view class="weui-article__p">
-											<navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-media-link" hover-class="weui-cell_active">
-												<view>{{root.root_alias?root.root_alias:root.root.name}} </view>
-											</navigator>
+										<view class="weui-cells weui-cells_after-title display_root">
+						                            <navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
 
+						                            <view class="weui-cell__bd">
+						                            	<view style="font-size:12px;font-weight:bold">
+						                            		<view wx:if="{{root.root_alias}}">
+						                            			{{root.root_alias}}
+						                            		</view>
+						                            		<view wx:else>
+						                            			{{root.root.name}}
+						                            		</view>
+						                            	</view>
+						                            	<view style="font-size:11px;font-weight:normal"> <rich-text nodes="{{root.root.description}}"></rich-text>  </view>
+						                            	<view style="font-size:11px;color:green;" wx:if="{{root.detail}}">
+						                            			{{root.detail}}
+						                            	</view>
 
-											<view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
-										</view>
+						                            </view>  
+
+						                            </navigator>
+						                </view>
+
 
 									</repeat>
 
@@ -269,36 +318,18 @@ font-size: 9px;
 						</repeat>
 					</view>
 
-
-					<view class="weui-article__p">
-						<radio-group bindchange="radioChange">
-
-								<repeat for="{{ explain_answer }}" key="id" index="index" item="answer">
-									<label class="weui-cell weui-check__label">
-				                        <radio class="weui-check" value="{{answer.id}}" checked="{{answer.checked}}"/>
-
-				                        <view class="weui-cell__bd {{answer.checked?'correct_answer':''}}">{{answer.explain}}</view>
-				                        <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{answer.checked}}">
-				                            <icon class="weui-icon-radio" type="success_no_circle" size="16"/>
-				                        </view>
-			                        </label>
-		                    	</repeat>
-
-	
-		                </radio-group>
-
-					</view>
-					
-
 					<view class="weui-article__p" wx:if="{{ShowExplain}}">
 						
+						 <view class="weui-cells weui-cells_after-title">
+			                <navigator url="" class="weui-cell weui-cell_access" bindtap="nextreview" hover-class="weui-cell_active">
+			                    <view class="weui-cell__bd" style="color:blue;font-size:13px;color:green;font-weight:bold;">点击继续</view>
+			                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
+			                </navigator>
 
-            		<view class="weui-cells weui-cells_after-title">
-		                <view class="weui-cell">
-		                    <view class="weui-cell__bd" bindtap="nextreview" style="color:blue">复习下一个单词</view>
-		                    <view class="weui-cell__ft" bindtap="displayexplain" style="font-size:9px">显示中文详情</view>
-		                </view>
-		            </view>
+			            </view>
+					</view>					
+		
+				<view class="weui-article__p" wx:if="{{ShowExplain}}">
 
 						<view class="showexplandetail" wx:if="{{showexplandetail}}">
 								<view wx:if="{{ reviewitem.image.image }}">
@@ -338,14 +369,30 @@ font-size: 9px;
 										</view>
 										<view wx:if="{{closecigen}}">
 											<repeat for="{{ reviewitem.root }}" key="id" index="index" item="root">
-												<view class="weui-article__p">
-													<navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-media-link" hover-class="weui-cell_active">
-														<view>{{root.root_alias?root.root_alias:root.root.name}} </view>
-													</navigator>
+
+												<view class="weui-cells weui-cells_after-title display_root">
+						                            <navigator url="/pages/words/cigen?id={{ root.root.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+
+						                            <view class="weui-cell__bd">
+						                            	<view style="font-size:12px;font-weight:bold">
+						                            		<view wx:if="{{root.root_alias}}">
+						                            			{{root.root_alias}}
+						                            		</view>
+						                            		<view wx:else>
+						                            			{{root.root.name}}
+						                            		</view>
+						                            	</view>
+						                            	<view style="font-size:11px;font-weight:normal"> <rich-text nodes="{{root.root.description}}"></rich-text>  </view>
+						                            	 <view style="font-size:11px;color:green;" wx:if="{{root.detail}}">
+						                            			{{root.detail}}
+						                            	</view>
+						                            </view>  
 
 
-													<view> <rich-text nodes="{{root.root_description}}"></rich-text>  </view>
-												</view>
+						                            </navigator>
+						                        </view>
+
+											
 
 											</repeat>
 
@@ -378,6 +425,48 @@ font-size: 9px;
 
 					</view>
 
+
+
+					<view class="weui-article__p">
+					<view class="weui-flex">
+		                <view class="weui-flex__item">
+		                	<view class="placeholder">
+		                		<view class="weui-cell__bd" bindtap="nextreview" style="text-align:left;font-size:13px;margin-top:5px;">从下列四个选项中选择最符合的中文释义: </view>
+		                	</view>
+		                </view>
+		            </view>
+						<radio-group bindchange="radioChange">
+
+								<repeat for="{{ explain_answer }}" key="id" index="index" item="answer">
+									<label class="weui-cell weui-check__label">
+				                        <radio class="weui-check" value="{{answer.id}}" checked="{{answer.checked}}"/>
+
+				                        <view class="weui-cell__bd {{answer.checked?'correct_answer':''}}">{{answer.explain}}</view>
+				                        <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{answer.checked}}">
+				                            <icon class="weui-icon-radio" type="success_no_circle" size="16"/>
+				                        </view>
+			                        </label>
+		                    	</repeat>
+
+	
+		                </radio-group>
+
+					</view>
+					<view class="weui-article__p" wx:if="{{ShowExplain}}">
+						
+
+	            		<view class="weui-cells weui-cells_after-title">
+			                <view class="weui-cell">
+			                  <view class="weui-cell__ft" bindtap="displayexplain" style="font-size:9px"><button class="weui-btn" type="primary" size="mini" plain="true" bindtap="displayexplain">显示中文详情</button>
+			                  </view>
+
+			                </view>
+			            </view>
+					</view>		
+					
+
+					
+
 				</view>
 			</view>
 
@@ -388,27 +477,79 @@ font-size: 9px;
 				:currentDate.sync="currentDate"
 				:hasIconList.sync="hasIconList"
 				></wepyCanlendar>
-
-				<view class="weui-cells__title" bindtap="reloadapp">每天打卡</view>
+				<view class="weui-flex learnagain">
+	                <view class="weui-flex__item">
+	                	<view class="placeholder">
+		                 <view class="weui-cell__bd level_base_title" bindtap="reviewagain">
+		                    	<view class='floatleft'><image class="avataricon"  src="../../images/oder.png" /></view>
+		                    	<view class='floatleft'>重新复习一次</view>
+		                  </view>
+		                </view>  
+	            	</view>
+		            <view class="weui-flex__item">
+		            	<view class="placeholder">
+		            		<view class="weui-cell__bd level_base_title" bindtap="learnnext">
+			                    	<view class='floatleft'><image class="avataricon"  src="../../images/translate.png" /></view>
+			                    	<view class='floatleft'>学习下一组单词</view>
+			                 </view>
+		            	</view>
+		            </view>
+            	</view>
 	            <view class="weui-cells weui-cells_after-title">
-	                <navigator url="/pages/words/wordbundle" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-	                    <view class="weui-cell__bd "><view class="level_base_title">{{wordbundle.level_base}}</view><view class="level_base_sub">当前词库学习进度 {{wordbundle.rememberwords}}/{{wordbundle.wordcounts}}</view></view>
-	                    <view class="weui-cell__ft weui-cell__ft_in-access" style='font-size:10px'>
-	                    	切换单词本
-						</view>
-	                </navigator>
+	                
+	                	<view wx:if="{{wordbundle.level_base}}">
+	                		<navigator url="/pages/words/wordbundle" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                		<view class="weui-cell__bd ">
+	                			<view class="weui-cell__bd level_base_title">
+			                    	<view class='floatleft'><image class="avataricon"  src="../../images/wordcard.png" /></view>
+			                    	<view class='floatleft custom_title'>{{wordbundle.level_base}}<view class="level_base_sub">当前词库学习进度 {{wordbundle.rememberwords}}/{{wordbundle.wordcounts}}</view></view>
+			                    </view>
+
+	                		</view>
+		                    <view class="weui-cell__ft weui-cell__ft_in-access" style='font-size:10px'>
+		                    	切换单词本
+							</view>
+							</navigator>
+	                	</view>
+	                	<view wx:else>
+	                		<navigator url="/pages/words/wordbundle" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                		<view class="weui-cell__bd ">
+	                			<view class="level_base_title"><image class="avataricon"  src="../../images/wordcard.png" />{{wordbundle.level_base}}</view>
+	                			<view class="level_base_sub">当前没有选择生词本</view>
+	                		</view>
+		                    <view class="weui-cell__ft weui-cell__ft_in-access" style='font-size:10px'>
+		                    	选择生词本
+							</view>
+							</navigator>
+	                	</view>
+	                    
+	                
 	                <navigator url="/pages/words/newwordtoday" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-	                    <view class="weui-cell__bd level_base_title">今日新单词</view>
+	                    <view class="weui-cell__bd level_base_title"><view class='floatleft'><image class="avataricon"  src="../../images/fontsize.png" /></view><view class='floatleft custom_title'>今日新单词</view></view>
 	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
 	                </navigator>
 	                <navigator url="/pages/words/reviewwordtoday" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-	                    <view class="weui-cell__bd level_base_title">今日需要复习单词</view>
+	                    <view class="weui-cell__bd level_base_title">
+	                    	<view class='floatleft'><image class="avataricon"  src="../../images/letter_ascent.png" /></view>
+	                    	<view class='floatleft custom_title'>今日需要复习单词</view>
+	                    </view>
 	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
 	                </navigator>
 	                <navigator url="/pages/words/rememberword" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-	                    <view class="weui-cell__bd level_base_title">已经掌握单词</view>
+	                    <view class="weui-cell__bd level_base_title">
+	                    	<view class='floatleft'><image class="avataricon"  src="../../images/badge.png" /></view>
+	                    	<view class='floatleft custom_title'>已经掌握单词</view>
+	                    </view>
 	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
 	                </navigator>
+	                <navigator url="/pages/words/wordstrang" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+	                    <view class="weui-cell__bd level_base_title">
+	                    	<view class='floatleft'><image class="avataricon"  src="../../images/books.png" /></view>
+	                    	<view class='floatleft custom_title'>我的生词本</view>
+	                    </view>
+	                    <view class="weui-cell__ft weui-cell__ft_in-access"/>
+	                </navigator>
+
 	            </view>
 	          
 
@@ -663,15 +804,136 @@ import wepyCanlendar from '../../components/calendar'
 	          },
 
 	          displayexplain(e){
-	          	 if(this.showexplandetail){
-	          	 	this.showexplandetail =false
-	          	 }else{
-	          	 	this.showexplandetail =true
-	          	 }
+	          	 this.showexplandetail =true
 	          },
 	          async reloadapp(e){
 		        await this.getTopic()
 				await this.getRoots(1,true)
+
+		        this.$apply() 
+	          },
+
+	          async learnnext(e){
+	          	let res = await wepy.showModal({
+                  title: '确认',
+                  content: '你确定需要学习一组新单词吗？',
+                  confirmText: '确认',
+                  cancelText: '取消'
+                })
+
+                // 用户点击取消后返回
+                if (!res.confirm) {
+                  return
+                }
+
+
+	          	let learnnextResponse = await api.request({
+		          url: 'learnnext',
+		          data: {
+		            user_id: this.userinfomation.id
+		          }
+		        })
+	          	this.wordpercentcount = 0
+		        let learnnext = learnnextResponse.data.data
+		        await this.getTopic()
+				await this.getRoots(1,true)
+
+		        this.$apply() 
+	          },
+
+	          async reviewagain(e){
+	          	
+	          	this.wordpercentcount = 0
+
+	          	let res = await wepy.showModal({
+                  title: '确认',
+                  content: '你确定需要再复习一次今天的单词吗？',
+                  confirmText: '确认',
+                  cancelText: '取消'
+                })
+
+                // 用户点击取消后返回
+                if (!res.confirm) {
+                  return
+                }
+
+
+	           let wordreviewResponse = await api.request({
+		      	url: 'reviewagain',
+		      	method: 'POST',
+		      	data: {
+		      		user_id: this.userinfomation.id
+
+		      	}
+		      })
+		      if(wordreviewResponse){
+		      	this.reviewdata = wordreviewResponse.data.data
+		      	if(this.wordreviewwordcount == 0){
+							this.wordreviewwordcount = wordreviewResponse.data.meta.pagination.total;
+				}
+		      	this.reviewdata.forEach(function (newsitem) {
+
+		           	// newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+		           	if(newsitem.word_review.status == 1){
+	           		newsitem.word_review.next_time="第一次复习，下次复习时间为一天后"
+		           	}else if(newsitem.word_review.status ==2){
+		           		newsitem.word_review.next_time="第二次复习, 下次复习时间为一天后"
+		           	}else if(newsitem.word_review.status ==3){
+		           		newsitem.word_review.next_time="第三次复习, 下次复习时间为两天后"
+		           	}else if(newsitem.word_review.status ==4){
+		           		newsitem.word_review.next_time="第四次复习，下次复习时间为两天后"
+		           	}else if(newsitem.word_review.status ==5){
+		           		newsitem.word_review.next_time="第五次复习， 下次复习时间为八天后"
+		           	}else if(newsitem.word_review.status ==6){
+		           		newsitem.word_review.next_time="第六次复习， 也是最后一次复习"
+		           	}
+		           	//newsitem.word_review.next_time = util.diffForJiyi(newsitem.word_review.status )
+		           })
+		      	if(this.reviewdata.length){
+		    			//this.answerlist.concat(this.reviewdata.explain)
+		    			this.ShowReview =true
+		    			this.ShowNewWord=false
+		    			
+
+		    		}
+		    		
+		    	}
+
+		    	if(this.ShowReview){
+		      		if(this.reviewdata.length){
+		      			let tmpdata =this.reviewdata.pop()
+		      			this.reviewitem = tmpdata
+		      			//this.autoplaymp3(tmpdata.voice[0].path)
+		      			try{
+			    				this.autoplaymp3(tmpdata.voice[0].path)
+			    			}catch (err) {
+				          
+				        	}
+
+
+		    			//this.reviewitem.answer.
+		    			let tmpexplain =""
+		    			for (let key in tmpdata.explain) {
+		    				tmpexplain = tmpdata.explain[key]
+		    				break
+		    			}
+		    			this.randanswer(tmpdata.word_id, tmpexplain)
+		    			/*
+		    			let reviewupdateResponse = await api.request({
+		    				url: 'viewupdate',
+		    				method: 'POST',
+		    				data: {
+		    					user_id: this.userinfomation.id,
+		    					word_id: this.reviewitem.word_id,
+		    				}
+		    			})
+						*/
+		    			this.$apply()
+		    			//console.log(this.reviewitem)
+		    		}
+	    	}
+
+		    	//console.log('this.reviewdata' + this.reviewdata )
 
 		        this.$apply() 
 	          },
@@ -1133,6 +1395,7 @@ import wepyCanlendar from '../../components/calendar'
 		  	this.ShowNewWord=false
 
 		  }
+		 // console.log('测试USER ID' + this.userinfomation.id)
 
 		      let wordreviewResponse = await api.request({
 		      	url: 'wordreview',
@@ -1287,7 +1550,7 @@ import wepyCanlendar from '../../components/calendar'
 			//this.$invoke('getRoots')
 			await this.getTopic()
 			await this.getRoots(1,true)
-
+			this.showexplandetail =false
 	        this.$apply() 
 	        /*
 			if(this.ShowNewWord==false&& this.ShowReview==false){
@@ -1318,6 +1581,7 @@ import wepyCanlendar from '../../components/calendar'
 
 		async onLoad(options) {
 			console.log('我是onLoad')
+			this.showexplandetail =false
 			let res = await wepy.getSystemInfo()
 			this.wordpercent = 0
 			this.wordpercentcount = 0
@@ -1326,11 +1590,12 @@ import wepyCanlendar from '../../components/calendar'
 			this.userinfomation = wepy.getStorageSync('userinfomini')
 
 			try{
-				if(this.userinfomation.id ==false){
+				if(this.userinfomation ==false){
+					console.log('测试登录接口111')
 					let accessToken = wepy.getStorageSync('access_token')
 
 				      // Token 存在则说明已登录
-				      if (accessToken) {
+				     if (accessToken) {
 				        // 测试 authRequest 接口
 				        let userResponse = await api.authRequest('user')
 				        this.userinfomation = userResponse.data
@@ -1339,8 +1604,7 @@ import wepyCanlendar from '../../components/calendar'
 				        console.log(userResponse.data)
 				        wepy.setStorageSync('userinfomini',userResponse.data)
 				        this.$apply()
-				    }
-				}else{
+				    }else{
 				    	let authResponse = await api.login()
 				    	let userResponse = await api.authRequest('user')
 				        this.userinfomation = userResponse.data
@@ -1350,11 +1614,13 @@ import wepyCanlendar from '../../components/calendar'
 				        wepy.setStorageSync('userinfomini',userResponse.data)
 				        this.$apply()
 				    }
+				}
 
 			}catch(err){
 
 
 			}
+			console.log('this.userinfomation' + this.userinfomation.id)
 			//await this.getTopic()
 			
 

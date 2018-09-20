@@ -321,6 +321,7 @@
     vertical-align: middle;
     text-align: center;
     font-weight: 500;
+    font-size:10px;
   }
   .wepy-calendar-weeks{
     margin: 30rpx 0;

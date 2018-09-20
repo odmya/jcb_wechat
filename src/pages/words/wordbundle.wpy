@@ -11,6 +11,7 @@
   }
   .page__hd{
     padding: 5px 10px;
+    text-align: center;
 
   }
   .weui-article__section{
@@ -96,6 +97,15 @@ text-align: left;
                                     </view>
                                   </view>
 
+                                      <view class="weui-cells weui-cells_after-title">
+                                          <view class="weui-cell weui-cell_switch">
+                                              <view class="weui-cell__bd">顺序背诵单词</view>
+                                              <view class="weui-cell__ft">
+                                                  <switch bindchange="listenerCheckboxSwitch" checked="{{isCheckedOrder}}"/>
+                                              </view>
+                                          </view>
+                                      </view>
+
                                   <view class="weui-btn-area">
                                       <view class="tips" style="font-size:12px;">
                                         温馨提示: 学生建议每天1-3个新单词，每个新单词默认需要复习7次，历时十五天。 以每天三个单词为例，十五天后需要每天复习3*15 = 45个单词，贵在坚持！复习比学习新单词更重要。
@@ -139,6 +149,7 @@ components = {
       // 用户名
       wordbundle: '',
       setbundle:false,
+      isCheckedOrder:false,
       maxsize: '',
       userinfomation:'',
       bundles:'',
@@ -193,6 +204,11 @@ components = {
               this.maxsize = e.detail.value
             },
 
+ listenerCheckboxSwitch: function(e) {
+  this.isCheckedOrder = e.detail.value
+    console.log('checkbox类型开关当前状态-----', e.detail.value)
+  },
+
             //更新单词本
             async updatebundle(e){
 
@@ -203,11 +219,17 @@ components = {
                   data: {
                     user_id: this.userinfomation.id,
                     bundle_id: this.wordbundle.id,
+                    order: this.isCheckedOrder,
                     maxsize: this.maxsize
                   }
                 })
+                console.log(this.isCheckedOrder)
                 this.wordbundle = updatebundleResponse.data.data
                 this.maxsize = this.wordbundle.maxsize
+
+                if(this.wordbundle.order){
+                  this.isCheckedOrder =true
+                }
 
                 this.$apply() 
             
@@ -292,9 +314,15 @@ components = {
                 this.setbundle =false
                 this.wordbundle = wordsettting.data.data
                 this.maxsize = this.wordbundle.maxsize
+                if(this.wordbundle.order){
+                  this.isCheckedOrder =true
+                }
+                
               }else{
                 this.setbundle =true
               }
+
+
 
                 let bundlelistResponse = await api.request({
                   url: 'bundlelist'

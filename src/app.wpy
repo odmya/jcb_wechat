@@ -52,8 +52,13 @@ export default class extends wepy.app {
       'pages/words/newwordtoday',
       'pages/words/reviewwordtoday',
       'pages/words/rememberword',
+      'pages/words/wordstrang',
+      'pages/course/course',
+      'pages/course/chapter',
       'pages/user'
     ],
+    requiredBackgroundModes:['audio'],
+
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',

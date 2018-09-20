@@ -1,18 +1,17 @@
 <template>
 
 <searchbar></searchbar>
-  <view class="page__bd word-top">
+  <view class="page__bd word-top" wx:if="{{userinfomation.nickname}}">
     <view class="weui-panel weui-panel_access">
-      <view class="weui-panel__hd">News</view>
+      <view class="weui-panel__hd">书籍</view>
       <view class="weui-panel__bd">
         <repeat for="{{ news }}" key="id" index="index" item="newsitem">
-          <navigator url="/pages/news/news?id={{ newsitem.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+          <navigator url="/pages/course/course?id={{ newsitem.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
             <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
               <image class="weui-media-box__thumb" src="{{domain}}/uploads/{{newsitem.image}}" />
             </view>
             <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-              <view class="weui-media-box__desc">{{ newsitem.title }}</view>
-              <view class="weui-media-box__info__meta timediff">{{ newsitem.updated_at_diff }}</view>
+              <view class="weui-media-box__desc">{{ newsitem.name }}</view>
             </view>
           </navigator>
         </repeat>
@@ -21,6 +20,9 @@
         </view>
       </view>
     </view>
+  </view>
+  <view wx:else>
+    <button  open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo">点击授权登录!</button>
   </view>
 </template>
 
@@ -47,8 +49,33 @@
       domain:'https://www.jciba.cn',
       page: 1,
       noMoreData: false,
+      userinfomation:'',
+      userinWechat:'',
       news:[]
     }
+
+    methods = {
+      async bindgetuserinfo(e){
+
+        let updateUserInfo = await api.request({
+                url: 'updateuserinfo',
+                method: 'POST',
+                data: {
+                  user_id: this.userinfomation.id,
+                  nickname: e.detail.userInfo.nickName,
+                  avatarurl: e.detail.userInfo.avatarUrl
+                }
+              })
+
+       let userResponse = await api.authRequest('user')
+       this.userinfomation = userResponse.data
+       wepy.setStorageSync('userinfomini',userResponse.data)
+       this.$apply()
+
+        console.log("更新后的"+this.userinfomation.nickname)
+      }
+    }
+
 
     async onPullDownRefresh() {
       this.noMoreData = false
@@ -72,7 +99,7 @@
 
       try {
           let newsResponse = await api.request({
-            url: 'news',
+            url: 'course',
             data: {
             page: page
           }
@@ -89,7 +116,7 @@
           let pagination = newsResponse.data.meta.pagination
 
           // 根据分页设置是否还有更多数据
-          if (pagination.current_page === pagination.total_pages) {
+          if (pagination.current_page === pagination.total_pages && pagination.current_page > 1) {
             this.noMoreData = true
           }
 
@@ -105,8 +132,48 @@
 
     }
 
-    onLoad(options) {
+    async onLoad(options) {
       this.getNews()
+      this.userinfomation = wepy.getStorageSync('userinfomini')
+
+
+      try{
+        if(this.userinfomation ==false){
+          console.log('测试登录接口111')
+          let accessToken = wepy.getStorageSync('access_token')
+
+              // Token 存在则说明已登录
+             if (accessToken) {
+                // 测试 authRequest 接口
+                let userResponse = await api.authRequest('user')
+                this.userinfomation = userResponse.data
+                this.loggedIn = true
+                console.log('测试登录接口')
+                console.log(userResponse.data)
+                wepy.setStorageSync('userinfomini',userResponse.data)
+                this.$apply()
+            }else{
+              let authResponse = await api.login()
+              let userResponse = await api.authRequest('user')
+                this.userinfomation = userResponse.data
+                this.loggedIn = true
+                console.log('直接登录...不需要点击登录')
+                console.log(userResponse.data)
+                wepy.setStorageSync('userinfomini',userResponse.data)
+                this.$apply()
+            }
+        }
+
+      }catch(err){
+
+
+      }
+
+      if(this.userinfomation.nickname == false){
+       let userResponse = await api.authRequest('user')
+       this.userinfomation = userResponse.data
+       this.$apply()
+      }
       
     }
          

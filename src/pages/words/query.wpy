@@ -39,15 +39,42 @@
     text-decoration: underline;
     font-size: 14px;
   }
-  .section_word{
+  .placeholder{
+text-align: center;
+  }
+  .has_remember{
+    width:64px;
+    float:right;
+  }
+  .weui-cells_after-title{
+    padding-bottom: 10px;
+    border-bottom-style: none;
+  }
 
+  .display_root .weui-cell{
+padding:5px;
   }
   </style>
   <template>
     <searchbar></searchbar>
       <view class="page word-top">
           <view class="page__hd">
-              <view class="page__title">{{ words.word }} </view>
+
+              <view class="weui-flex">
+                <view class="weui-flex__item"><view class="placeholder">
+                  {{ words.word }}  
+                  <view wx:if="{{has_remember}}" class="has_remember">
+                    <image class="avatar"  src="../../images/remove.png" bindtap="remove_word"/>
+                  </view>
+                  <view wx:else class="has_remember">
+                    <image class="avatar"  src="../../images/add.png" bindtap="add_word"/>
+                  </view>
+
+                  
+                </view> 
+              </view>
+            </view>
+
               <view class="weui-flex">
                 <repeat for="{{ words.voice.data }}" key="id" index="index" item="voice">
 
@@ -96,14 +123,23 @@
                             </view>
                             <view wx:if="{{closecigen}}">
                               <repeat for="{{ words.root.data }}" key="id" index="index" item="root">
-                                <view class="weui-article__p">
-                                   <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-media-link" hover-class="weui-cell_active">
-                                     <view>{{root.root_alias?root.root_alias:root.root}} </view>
-                                   </navigator>
-
-                                  
-                                  <view> <rich-text nodes="{{root.detail?root.detail:root.root_description}}"></rich-text>  </view>
-                                </view>
+                                 <view class="weui-cells weui-cells_after-title display_root">
+                                  <navigator url="/pages/words/cigen?id={{ root.root_id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                          <view style="font-size:12px;font-weight:bold;padding:0px 5px;">
+                                            <view wx:if="{{root.root_alias}}">
+                                              {{root.root_alias}}
+                                            </view>
+                                            <view wx:else>
+                                              {{root.root}}
+                                            </view>
+                                          </view>
+                                          <view style="font-size:11px;font-weight:normal"> <rich-text nodes="{{root.root_description}}"></rich-text>  
+                                            <view style="font-size:11px;color:green;" wx:if="{{root.detail}}">
+                                              {{root.detail}}
+                                          </view></view>
+                                           
+                                  </navigator>        
+                                 </view>  
 
                               </repeat>
                               
@@ -113,10 +149,7 @@
 
                       <view class="weui-article__section1" wx:if="{{ words.sentence.data.length }}">
                         <view class="weui-panel__ft">
-                            <view class="weui-cell weui-cell_access weui-cell_link">
-                                <view class="weui-cell__bd" @tap="liju">例句</view>
-                                <view class="weui-cell__ft weui-cell__ft_in-access" @tap="liju"></view>
-                            </view>
+                            <view class="weui-cell__bd" @tap="liju">权威例句</view>
                              <view wx:if="{{closeliju}}">
                               <repeat for="{{ words.sentence.data }}" key="id" index="index" item="liju">
                                 <view class="weui-article__p">
@@ -161,6 +194,8 @@
     data = {
         // 话题数据
       words: '',
+      userinfom: '',
+      has_remember:false,
       closetip: true,
       closecigen: true,
       closeliju: true,
@@ -192,6 +227,69 @@
               }
 
           },
+           async add_word(e){
+              
+              let res = await wepy.showModal({
+                  title: '确认',
+                  content: '需要添加该单词到生词本吗？',
+                  confirmText: '确认',
+                  cancelText: '取消'
+                })
+
+                // 用户点击取消后返回
+                if (!res.confirm) {
+                  return
+                }
+
+                let wordstrangeResponse = await api.request({
+                              url: 'wordstrange',
+                              method: 'POST',
+                                                data: {
+                        
+                                                  word_id: this.words.id,
+                                                  user_id: this.userinfom.id
+                                                }
+                           })
+                let wordstrange = wordstrangeResponse.data
+                if(wordstrange.add_word){
+                  this.has_remember = true
+                  this.$apply()
+                }
+                //this.has_remember = wordremember.has_remember
+
+
+            },
+
+            async remove_word(e){
+              
+              let res = await wepy.showModal({
+                  title: '确认',
+                  content: '你确定需要从已记单词表中或生词表删除？',
+                  confirmText: '确认',
+                  cancelText: '取消'
+                })
+
+                // 用户点击取消后返回
+                if (!res.confirm) {
+                  return
+                }
+
+                let removerememberResponse = await api.request({
+                              url: 'removeremember',
+                              method: 'POST',
+                                                data: {
+                        
+                                                  word_id: this.words.id,
+                                                  user_id: this.userinfom.id
+                                                }
+                           })
+                let removeremember = removerememberResponse.data
+                this.has_remember = false
+                this.$apply()
+
+
+            },
+
 
          playmp3(event){
                   let path="https://www.jciba.cn/" + event.currentTarget.dataset.path
@@ -227,25 +325,32 @@
             
             let accessToken = wepy.getStorageSync('access_token')
             let userinfom = wepy.getStorageSync('userinfomini')
-            if (accessToken) {
-                if(userinfom==false){
+            this.userinfom = wepy.getStorageSync('userinfomini')
+            if(userinfom == false){
+                let accessToken = wepy.getStorageSync('access_token')
 
-                   let userResponse = await api.authRequest('user')
-                    this.userInfo = userResponse.data
+                // Token 存在则说明已登录
+              if (accessToken) {
+                  // 测试 authRequest 接口
+                  let userResponse = await api.authRequest('user')
+                  this.userinfom = userResponse.data
+                  this.loggedIn = true
+                  console.log('测试登录接口')
+                  console.log(userResponse.data)
+                  wepy.setStorageSync('userinfomini',userResponse.data)
+                  this.$apply()
+              }else{
+                  let authResponse = await api.login()
+                  let userResponse = await api.authRequest('user')
+                    this.userinfom = userResponse.data
                     this.loggedIn = true
-                    //console.log(userResponse.data)
+                    console.log('直接登录...不需要点击登录')
+                    console.log(userResponse.data)
                     wepy.setStorageSync('userinfomini',userResponse.data)
                     this.$apply()
-
                 }
-                // 测试 authRequest 接口
-               
-              }else{
-                wepy.setStorageSync('userinfomini',"")
-                userinfom = ""
-
-              }
-      
+            }
+        
             if(userinfom){
               let searchcacheResponse = await api.request({
                               url: 'wordsearchcache',
@@ -260,6 +365,21 @@
               wepy.setStorageSync('searchresultcache', searchresultcache)
 
               //console.log("searchresultcache:"+searchresultcache)
+
+            }
+            if(words.id){
+              let wordrememberResponse = await api.request({
+                              url: 'wordremember',
+                              method: 'POST',
+                                                data: {
+                        
+                                                  word_id: words.id,
+                                                  user_id: userinfom.id
+                                                }
+                           })
+              let wordremember = wordrememberResponse.data
+              this.has_remember = wordremember.has_remember
+              console.log('查看是否已经记住' + wordremember.has_remember)
 
             }
             /*
@@ -295,6 +415,8 @@
       }
     }
 
+    async onShow(options) {
+    }
 
       onLoad(options) {
         this.getTopic(options.word)

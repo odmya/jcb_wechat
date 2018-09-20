@@ -28,10 +28,26 @@
     text-overflow:ellipsis;
     white-space:nowrap; 
     }
+.weui-cells .weui-cell__bd{
+  text-align: left;
+    font-size:11px;
+}
+.weui-cells .weui-cell__ft{
+
+  text-align: left;
+    font-size:11px;
+}
+.weui-navbar{
+  border-bottom:none;
+}
+
+.weui-cell{
+  padding:5px;
+}
 .navbar .weui-tab__content{padding-top:5px;}
 </style>
 <template>
-
+<searchbar></searchbar>
     <view class="navbar page">
         <view class="page__bd">
             <view class="weui-tab">
@@ -44,12 +60,14 @@
                 <view class="weui-tab__panel">
                     <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
                          <repeat for="{{ qianzhui }}" key="id" index="index" item="qz">
-                              <view class="weui-article__p">
-                                 <navigator url="/pages/words/cigen?id={{ qz.id }}" class="weui-media-link" hover-class="weui-cell_active">
-                                   <view>{{qz.name}} </view>
-                                 </navigator>
-                              </view>
 
+                            <view class="weui-cells weui-cells_after-title">
+                              <navigator url="/pages/words/cigen?id={{ qz.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                  <view class="weui-cell__bd"><view style="font-size:12px;font-weight:bold">{{qz.name}}</view><view><rich-text nodes="{{qz.description}}"></rich-text> </view></view>  
+                              </navigator>
+    
+                            </view>
+              
                          </repeat>
                           <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
                             <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
@@ -58,11 +76,13 @@
                     <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
                         
                         <repeat for="{{ houzhui }}" key="id" index="index" item="hz">
-                              <view class="weui-article__p">
-                                 <navigator url="/pages/words/cigen?id={{ hz.id }}" class="weui-media-link" hover-class="weui-cell_active">
-                                   <view>{{hz.name}} </view>
-                                 </navigator>
-                              </view>
+                            <view class="weui-cells weui-cells_after-title">
+                              <navigator url="/pages/words/cigen?id={{ hz.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                  <view class="weui-cell__bd"><view style="font-size:12px;font-weight:bold">{{hz.name}}</view><view><rich-text nodes="{{hz.description}}"></rich-text> </view></view>  
+                              </navigator>
+    
+                            </view>
+
                          </repeat>
                           <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
                             <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
@@ -71,11 +91,12 @@
                     </view>
                     <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
                         <repeat for="{{ cizhui }}" key="id" index="index" item="cz">
-                              <view class="weui-article__p">
-                                 <navigator url="/pages/words/cigen?id={{ cz.id }}" class="weui-media-link" hover-class="weui-cell_active">
-                                   <view>{{cz.name}} </view>
-                                 </navigator>
-                              </view>
+                            <view class="weui-cells weui-cells_after-title">
+                              <navigator url="/pages/words/cigen?id={{ cz.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                  <view class="weui-cell__bd"><view style="font-size:12px;font-weight:bold">{{cz.name}}</view><view><rich-text nodes="{{cz.description}}"></rich-text> </view></view>  
+                              </navigator>
+    
+                            </view>
 
                          </repeat>
                           <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
@@ -90,6 +111,7 @@
 
 <script>
     import wepy from 'wepy'
+    import Searchbar from '../../components/searchbar'
     import api from '@/utils/api'
     const sliderWidth = 96 // 需要设置slider的宽度，用于计算中间位置
 
@@ -97,6 +119,11 @@
         config = {
           enablePullDownRefresh: true
         }
+
+        components = {
+      searchbar: Searchbar
+    }
+
 
         data = {
             tabs: ['前缀', '后缀', '词根'],

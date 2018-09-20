@@ -1,0 +1,541 @@
+
+<style>
+page{
+    background-color: #FFFFFF;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  padding:0px;
+  margin: 0px;
+}
+.avatar2{
+  width: 12px;
+  height: 12px;
+}
+.page__hd{
+  padding: 5px 10px;
+  text-align: center;
+}
+.weui-article__section{
+ padding: 5px;
+}
+.top-margin{
+  margin:10px 10px 120px 10px;
+}
+.page__title{
+  font-size:15px;
+  font-weight: bold;
+}
+.weui-article__section1{
+  padding-bottom: 2px;
+}
+.weui-article__p,.page__desc{
+  font-size:12px;
+}
+.cigen_article{
+  text-align: left;
+}
+
+.weui-media-link{
+  color:blue;
+  text-decoration: underline;
+  font-size: 14px;
+}
+.fixhigh{
+  margin-bottom: 50px;
+}
+.page__desc img{
+width:100%;
+height: 100%;
+}
+
+.menufooter{
+     position:fixed; 
+     bottom:0;
+     width: 100%;
+     background-color: #F8F8F8;
+     
+}
+
+.return_home{
+  font-size: 12px;
+  font-weight: bold;
+
+}
+.highlight{
+  color: green;
+  font-weight: bold;
+}
+
+.item_entry{
+  padding:3px 2px;
+  font-size: 11px;
+}
+.audio_play{
+  font-size: 10px;
+}
+.audio_play .slider{
+  height:10px;
+}
+.placeholder{
+  padding:3px;
+  padding-top:10px;
+}
+
+.weui-flex .weui-flex__item{
+  padding:0px;
+  margin: 0px;
+}
+
+.weui-flex .weui-flex__item .placeholder{
+  height: 40px;
+  padding:0px;
+  margin: 0px;
+
+}
+.canplay{
+  font-size:15px;
+  color:#1296db;
+  background-color: #F8F8F8;
+  text-align: center;
+}
+.wx-switch-input{width:32px !important;height:20px !important;}
+.wx-switch-input::before{width:31px !important;height: 20px !important;}
+.wx-switch-input::after{width: 18px !important;height: 18px !important;}
+
+</style>
+<template>
+  <searchbar></searchbar>
+    <view class="page top-margin">
+      <view wx:if="{{canplay == false}}" class='canplay'>正在加载...</view>
+
+ <view class="weui-flex">
+                <view class="weui-flex__item"><view class="placeholder return_home"><navigator class="weui-cell__bd" url="/pages/course/course?id={{ chapter.course_id }}" hover-class="weui-cell_active">{{ chapter.course_name }}</navigator></view></view>
+                <view class="weui-flex__item"><view class="placeholder return_home"><navigator class="weui-cell__bd" url="/pages/index" open-type="switchTab" hover-class="weui-cell_active"><image class="avatar2"  src="../../images/home2.png" />返回首页</navigator></view></view></view>
+
+      <repeat for="{{ chapterlist }}" key="id" index="index" item="entry">
+                    <view wx:if="{{entry.highlight}}">
+                      <view class="item_entry highlight"  @tap="seektest({{index}},{{entry.startTime}})">
+                              <view class="weui-cell__bd" wx:if="{{showenglish}}"><view>{{entry.english}}</view></view>  
+                              <view wx:if="{{entry.chinese}}">
+                                <view class="weui-cell__bd" wx:if="{{showchinese}}"><view>{{entry.chinese}}</view></view>  
+                              </view>
+                      </view>
+                    </view>
+                    <view wx:else>
+                      <view class="item_entry"  @tap="seektest({{index}},{{entry.startTime}})">
+                              <view class="weui-cell__bd" wx:if="{{showenglish}}"><view>{{entry.english}}</view></view>  
+                              <view wx:if="{{entry.chinese}}">
+                                <view class="weui-cell__bd" wx:if="{{showchinese}}"><view>{{entry.chinese}}</view></view>  
+                              </view>
+                      </view>
+                    </view>
+
+                            
+              
+       </repeat>
+        
+    </view>
+
+    <view style="text-align:center">
+                <button class="weui-btn mini-btn" type="primary" style="margin-bottom: 80px" open-type="share" size="mini">分享给朋友</button>
+    </view> 
+
+   
+
+    <view style="text-align:center" class='audio_play menufooter'>
+        <view class="weui-flex">
+                <view><view class="placeholder">{{currentTime}} </view></view>
+                <view class="weui-flex__item"><view><slider bindchange="sliderChange" step="2" value="{{currentTime}}" max="{{duration}}" class="slider" selected-color="#ff5e5e"/></view></view>
+                <view><view class="placeholder">{{duration}}</view></view>
+        </view>
+      
+
+      <view class="weui-flex">
+                
+                <view class="weui-flex__item"><view class="placeholder"><image wx:if="{{ispaused}}" class="avatar" src="../../images/play.png" @tap="audioPlay"/><image  wx:else class="avatar" src="../../images/pause.png" @tap="audioPause"/></view></view>
+                <view class="weui-flex__item"><view class="placeholder" style="padding-top: 5px">英文<switch bindchange="showEnglishSwitch" checked="{{showenglish}}"/></view></view>
+                <view class="weui-flex__item"><view class="placeholder" style="padding-top: 5px">中文<switch bindchange="showChineseSwitch" checked="{{showchinese}}"/></view></view>
+                <view class="weui-flex__item"><view class="placeholder" style="padding-top: 5px">单句重复<switch bindchange="showRepeatSwitch" checked="{{showRepeat}}"/></view></view>
+                <view class="weui-flex__item"><view class="placeholder" style="padding-top: 2px">
+                  <picker class="wepy-calendar-date" @change="bindPickerChange" value="{{index}}" range="{{chapterlistoption}}">
+                      <image class="avatar" src="../../images/home1.png" />                                  
+                  </picker>
+                </view></view>
+      </view>
+
+
+      </view>  
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+  import Searchbar from '../../components/searchbar'
+  import Menufoot from '../../components/menu'
+  export default class CourseShow extends wepy.page {
+    components = {
+            searchbar: Searchbar,
+        }
+    config = {
+      navigationBarTitleText: '课程',
+    }
+    data = {
+      chapter:'',
+      innerAudioContext:'',
+      path:'',
+      currentTime:'',
+      duration:'',
+      ispaused:true,
+      chapterlist:[],
+      showenglish:true,
+      showchinese:true,
+      showRepeat:false,
+      chapterlistoption:'',
+      canplay:false,
+      valuelist:'',
+      lineNo:0
+
+    }
+
+
+    methods = {
+
+      playmp3(event){
+                  
+                  this.innerAudioContext.onPlay(() => {
+                      console.log('开始播放')
+                  })
+                   
+              },
+
+     audioPlay(event) {
+      
+      var that=this;
+      this.innerAudioContext.play()
+      this.innerAudioContext.onPlay(() => {
+                      console.log('开始播放')
+                      this.updateTime()
+                  })
+      //this.innerAudioContext.play()
+      this.ispaused = false
+      console.log('is false or true' + this.ispaused)
+      this.$apply()
+
+    },
+
+    async bindPickerChange(e){
+      let chapter = ''
+      let newsResponse = await api.request({
+                  url: 'chapter/show/' + this.valuelist[e.detail.value],
+                })
+      chapter = newsResponse.data.data
+      if(chapter){
+        //this.innerAudioContext.destroy()
+      }
+      this.chapter = chapter
+            this.chapterlist = this.chapter.chapter_entry
+            this.path="https://www.jciba.cn/uploads/" + this.chapter.voice_path
+
+                  this.innerAudioContext = wepy.getBackgroundAudioManager()
+                  this.innerAudioContext.title = this.chapter.course_name
+                  this.innerAudioContext.singer = "记词吧"
+                  this.innerAudioContext.pname = this.chapter.course_name
+                  this.innerAudioContext.autoplay = true
+                  this.innerAudioContext.obeyMuteSwitch = false 
+                  this.innerAudioContext.src = this.path
+                  this.lineNo =0
+                  this.ispaused = false
+                  this.canplay =false
+                  this.innerAudioContext.onPlay(() => {
+                      this.updateTime()
+                  })
+
+
+                  console.log('切换')
+                  this.$apply()
+    },
+
+
+    showEnglishSwitch(e){
+      this.showenglish = e.detail.value
+      this.$apply()
+    },
+
+    showRepeatSwitch(e){
+      this.showRepeat = e.detail.value
+      this.$apply()
+    },
+
+    showChineseSwitch(e){
+      this.showchinese = e.detail.value
+      this.$apply()
+    },
+    
+    audioPause(event) {
+      console.log('暂停播放')
+      this.innerAudioContext.pause()
+      this.ispaused = true
+      this.$apply()
+    },
+
+    seektest(id, timedata) {
+      this.chapterlist.forEach(function (newsitem) {
+                    //tmplist[newsitem.id] = newsitem.level_bases
+                    newsitem.highlight =false 
+                    
+                })
+
+      timedata = Number(timedata);
+      this.lineNo = id
+      console.log(typeof timedata);
+      console.log('从这里开始播放this.lineNo' + this.lineNo)
+      this.innerAudioContext.seek(timedata)
+      this.AutoAudioPlay()
+      this.$apply()
+     // this.innerAudioContext.play()
+    },
+
+    audio14(event) {
+      this.innerAudioContext.seek(14)
+    },
+    audioStart(event) {
+      this.innerAudioContext.seek(0)
+    },
+    sliderChange(event) {
+      this.innerAudioContext.seek(event.detail.value)
+      this.lineNo =0
+
+      this.chapterlist.forEach(function (newsitem,tmpindex) {
+                    //tmplist[newsitem.id] = newsitem.level_bases
+                    if (Number(newsitem.startTime) <= event.detail.value){
+                          this.lineNo =  tmpindex
+                          //this.innerAudioContext.seek(newsitem.startTime)
+                      }
+                    newsitem.highlight =false 
+                }, this)
+
+
+      console.log('测试sliderChange' + event.detail.value)
+      this.AutoAudioPlay()
+      
+    }
+
+
+
+
+    }
+
+     AutoAudioPlay(){
+      this.innerAudioContext.play()
+      this.innerAudioContext.onPlay(() => {
+                      console.log('开始播放')
+                      this.updateTime()
+                  })
+      this.ispaused = false
+      this.$apply()
+
+     }
+
+
+     seekaudio(id) {
+
+      let timedata = Number(this.chapterlist[id].startTime);
+      console.log('stop from hereid' + id)
+      this.chapterlist.forEach(function (newsitem) {
+                    //tmplist[newsitem.id] = newsitem.level_bases
+                    newsitem.highlight =false 
+                    
+                })
+
+    // this.lineNo = id
+      console.log(typeof timedata);
+      console.log('BUG 记录id' + id)
+      console.log('从这里开始播放timedata' + timedata)
+      this.innerAudioContext.seek(timedata -1)
+      this.innerAudioContext.onSeeked(() => {
+                     // this.lineNo = id -1
+                      console.log('开始seek 测试time from' + timedata)
+                      //this.updateTime()
+                  })
+
+      this.innerAudioContext.play()
+      this.innerAudioContext.onPlay(() => {
+                      console.log('开始播放123456')
+                      this.updateTime()
+                  })
+      this.ispaused = false
+      console.log('重复播放开始' + id)
+      this.$apply()
+
+      
+
+     // this.innerAudioContext.play()
+    }
+
+
+    updateTime() {
+      
+      this.innerAudioContext.onTimeUpdate(() => {
+        this.currentTime = this.innerAudioContext.currentTime.toFixed(2)
+        this.duration = this.innerAudioContext.duration.toFixed(2)
+if(this.duration){
+  this.canplay =true
+}
+
+       // this.currentTime = parseInt(this.currentTime / 60) + ":" + parseInt(this.currentTime % 60)
+       // this.duration = parseInt(this.duration / 60) + ":" + parseInt(this.duration % 60)
+
+        let linecurrent = ''
+
+        //console.log('这里显示行号' + this.lineNo )
+
+         if(this.showRepeat){
+          if(this.currentTime>=this.chapterlist[this.lineNo+1].startTime){
+  
+            let timedata = Number(this.chapterlist[this.lineNo].startTime);
+            this.chapterlist[this.lineNo].highlight =true
+            this.innerAudioContext.startTime =  timedata
+            this.lineNo = this.lineNo
+            this.seekaudio(this.lineNo)
+            //console.log('test....12121.' + this.chapterlist[this.lineNo-1].startTime)
+            //this.AutoAudioPlay()
+            //this.innerAudioContext.pause()
+            //console.log('update time 里面暂停' )
+            return
+            
+          }
+        }
+
+     
+        if(this.lineNo < this.chapterlist.length-1){
+
+          if (Number(this.chapterlist[this.lineNo].startTime) <= this.currentTime &&
+            Number(this.currentTime <= this.chapterlist[this.lineNo + 1].startTime)) {
+            //lineHeight(lineNo);
+            if(this.lineNo>0){
+              this.chapterlist[this.lineNo-1].highlight =false 
+            }
+            
+            this.chapterlist[this.lineNo].highlight =true
+            linecurrent = this.lineNo
+            //console.log('这里需要高亮显示' + this.lineNo )
+
+          if(this.showRepeat ==false){
+           this.lineNo++
+           }
+        
+
+
+           
+          }
+
+        }else{
+
+          if (Number(this.chapterlist[this.lineNo].startTime) <= this.currentTime ){
+            //lineHeight(lineNo);
+            if(this.lineNo>0){
+              this.chapterlist[this.lineNo-1].highlight =false 
+            }
+            
+            this.chapterlist[this.lineNo].highlight =true
+            linecurrent = this.lineNo
+            //console.log('这里需要高亮显示' + this.lineNo )
+           // this.lineNo++;
+          }
+
+        }
+
+
+        this.$apply()
+                 
+                })
+
+    }
+    // 获取词根单词
+    async getNews(id) {
+      //let cigen = wepy.getStorageSync("cigen"+id) 设置缓存
+      let chapter = ''
+      if (!chapter) {
+          try {
+
+          let newsResponse = await api.request({
+            url: 'chapter/show/' + id,
+          })
+          chapter = newsResponse.data.data
+          //wepy.setStorageSync("cigen"+id, cigen) 设置缓存
+
+
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+       // console.log(`缓存成功`+ "cigen"+id)  
+      }
+      this.chapter = chapter
+      this.chapterlist = this.chapter.chapter_entry
+      this.path="https://www.jciba.cn/uploads/" + this.chapter.voice_path
+
+                  this.innerAudioContext = wepy.getBackgroundAudioManager()
+                  this.innerAudioContext.title = this.chapter.course_name
+                  this.innerAudioContext.singer = "记词吧"
+                  this.innerAudioContext.pname = this.chapter.course_name
+                  this.innerAudioContext.autoplay = true
+                  this.innerAudioContext.obeyMuteSwitch = false 
+                  this.innerAudioContext.src = this.path
+
+                  this.innerAudioContext.onPlay(() => {
+                      this.updateTime()
+                  })
+                  this.ispaused = false
+       
+
+
+                  
+      let chapterlistdata = this.chapter.chapter_list
+                let tmplist =[]
+                let valuelist =[]
+                
+                  chapterlistdata.forEach(function (newsitem) {
+                  //tmplist[newsitem.id] = newsitem.level_bases
+                  tmplist.push(newsitem.name)
+                  valuelist.push(newsitem.id)
+                  
+                  })
+                this.chapterlistoption = tmplist
+                this.valuelist = valuelist
+                //console.log(this.chapterlistoption)
+
+      this.$apply()
+    }
+
+    onUnload(){
+      //this.innerAudioContext.destroy()
+      //this.innerAudioContext=""
+    }
+    onHide(){
+      //this.innerAudioContext.destroy()
+      //this.innerAudioContext=""
+    }
+
+     onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: this.chapter.name,
+        path: "/pages/course/chapter?id="+this.chapter.id
+      }
+    }
+
+    onLoad(options) {
+      this.getNews(options.id)
+    }
+
+  }
+</script>

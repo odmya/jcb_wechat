@@ -1,0 +1,177 @@
+
+<style>
+page{
+    background-color: #FFFFFF;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  padding:0px;
+  margin: 0px;
+}
+.page__hd{
+  padding: 5px 10px;
+  text-align: center;
+}
+.weui-article__section{
+ padding: 5px;
+}
+.top-margin{
+  margin:10px 10px 120px 10px;
+}
+.page__title{
+  font-size:15px;
+  font-weight: bold;
+}
+.weui-article__section1{
+  padding-bottom: 2px;
+}
+.weui-article__p,.page__desc{
+  font-size:12px;
+}
+.cigen_article{
+  text-align: left;
+}
+
+.weui-media-link{
+  color:blue;
+  text-decoration: underline;
+  font-size: 14px;
+}
+.fixhigh{
+  margin-bottom: 50px;
+}
+.page__desc img{
+width:100%;
+height: 100%;
+}
+
+.menufooter{
+     position:fixed; 
+     bottom:0;
+     width: 100%;
+     background-color: #F8F8F8;
+     
+}
+.highlight{
+  color: green;
+  font-weight: bold;
+}
+
+.item_entry{
+  padding:3px 2px;
+  font-size: 11px;
+}
+.audio_play{
+  font-size: 10px;
+}
+.audio_play .slider{
+  height:10px;
+}
+.placeholder{
+  padding:3px;
+  padding-top:10px;
+}
+
+.weui-flex .weui-flex__item{
+  padding:0px;
+  margin: 0px;
+}
+
+.weui-flex .weui-flex__item .placeholder{
+  height: 40px;
+  padding:0px;
+  margin: 0px;
+
+}
+.wx-switch-input{width:32px !important;height:20px !important;}
+.wx-switch-input::before{width:31px !important;height: 20px !important;}
+.wx-switch-input::after{width: 18px !important;height: 18px !important;}
+</style>
+<template>
+  <searchbar></searchbar>
+    <view class="page top-margin">
+      <view class="page__title">{{ course.name }}</view>
+
+      <repeat for="{{ course.chapters }}" key="id" index="index" item="chapter">
+
+                            <view class="weui-cells weui-cells_after-title">
+                              <navigator url="/pages/course/chapter?id={{ chapter.id }}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                  <view class="weui-cell__bd"><view style="font-size:11px;">{{chapter.name}}</view></view>  
+                              </navigator>
+    
+                            </view>
+              
+       </repeat>
+
+      <view style="text-align:center">
+                <button class="weui-btn mini-btn" type="primary" style="margin-bottom: 80px" open-type="share" size="mini">分享给朋友</button>
+      </view>           
+    </view>
+    <menufoot></menufoot>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+  import Searchbar from '../../components/searchbar'
+  import Menufoot from '../../components/menu'
+  export default class CourseShow extends wepy.page {
+    components = {
+            searchbar: Searchbar,
+            menufoot: Menufoot
+        }
+    config = {
+      navigationBarTitleText: '课程例表',
+    }
+    data = {
+      course:''
+
+    }
+
+
+    methods = {
+
+    }
+    // 获取词根单词
+    async getNews(id) {
+      //let cigen = wepy.getStorageSync("cigen"+id) 设置缓存
+      let course = ''
+      if (!course) {
+          try {
+
+          let newsResponse = await api.request({
+            url: 'course/show/' + id,
+          })
+          course = newsResponse.data.data
+          //wepy.setStorageSync("cigen"+id, cigen) 设置缓存
+
+
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+        console.log(`缓存成功`+ "cigen"+id)  
+      }
+      this.course = course
+      this.$apply()
+    }
+
+     onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: this.course.name,
+        path: "/pages/course/course?id="+this.course.id
+      }
+    }
+
+    onLoad(options) {
+      this.getNews(options.id)
+    }
+  }
+</script>
